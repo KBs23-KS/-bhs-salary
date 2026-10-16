@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="./src/style.css">
 
 <style>
-/* ปรับเฉพาะหน้าแอดมิน */
+/* รูปแบบหน้าแอดมินเดิม */
 #adminPage.admin-main {
   max-width:none;
   width:100%;
@@ -151,7 +151,7 @@
   display:none;
 }
 
-/* ปุ่มเลือกทั้งหมดในหน้าผู้เข้าร่วม */
+/* เลือกผู้เข้าร่วมทั้งหมด - คงเดิม */
 #modalRoot .roster-select-tools {
   display:flex;
   gap:10px;
@@ -183,8 +183,6 @@
   font-weight:700;
   color:#475569;
 }
-
-/* เมนูด้านซ้ายสำหรับมือถือ */
 @media(max-width:900px) {
   #adminPage .admin-sidebar {
     position:fixed;
@@ -225,11 +223,58 @@
     padding:9px 10px;
   }
 }
+
+/* เพิ่มใหม่: คำแนะนำรอบการประเมินตรงกลาง */
+#publicPage .evaluation-guide {
+  box-sizing:border-box;
+  width:100%;
+  max-width:490px;
+  margin:2px auto 6px;
+  padding:15px 16px;
+  border:1px solid #c7d2fe;
+  border-radius:16px;
+  background:#eef2ff;
+  color:#334155;
+  text-align:center;
+}
+#publicPage .evaluation-guide-title {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  font-weight:800;
+  color:#3730a3;
+  margin:0 0 8px;
+}
+#publicPage .evaluation-guide-line {
+  margin:5px 0;
+  font-size:14px;
+  line-height:1.65;
+}
+#publicPage .evaluation-guide-line.active {
+  font-weight:800;
+  color:#312e81;
+}
+#publicPage .evaluation-guide-current {
+  border-top:1px solid #c7d2fe;
+  margin:10px 0 0;
+  padding-top:9px;
+  font-size:13px;
+  color:#475569;
+}
+@media(max-width:480px) {
+  #publicPage .evaluation-guide {
+    padding:13px 10px;
+  }
+  #publicPage .evaluation-guide-line {
+    font-size:13px;
+  }
+}
 </style>
 </head>
+
 <body>
 
-<!-- หน้าแรกเดิมของครู -->
 <header class="header">
   <div class="header-inside">
     <div class="brand-icon">
@@ -246,10 +291,12 @@
   </div>
 </header>
 
+<!-- หน้าแรกของครู -->
 <main id="publicPage" class="public-main">
   <section class="search-card">
     <div class="round-blur blur1"></div>
     <div class="round-blur blur2"></div>
+
     <div class="search-intro">
       <div class="fingerprint">
         <i class="ph ph-fingerprint"></i>
@@ -261,13 +308,14 @@
     <form id="searchForm" class="search-form">
       <div class="id-wrap">
         <i class="ph ph-identification-card"></i>
-        <input type="text"
-               id="nationalId"
-               maxlength="13"
-               inputmode="numeric"
-               autocomplete="off"
-               placeholder="กรอกรหัส 13 หลักที่นี่"
-               required>
+        <input
+          type="text"
+          id="nationalId"
+          maxlength="13"
+          inputmode="numeric"
+          autocomplete="off"
+          placeholder="กรอกรหัส 13 หลักที่นี่"
+          required>
       </div>
 
       <div class="two">
@@ -281,6 +329,26 @@
         </label>
       </div>
 
+      <!-- เพิ่มใหม่: คำแนะนำอยู่ตรงกลาง -->
+      <div class="evaluation-guide" aria-live="polite">
+        <div class="evaluation-guide-title">
+          <i class="ph ph-info" aria-hidden="true"></i>
+          คำแนะนำการเลือกรอบการประเมิน
+        </div>
+
+        <p class="evaluation-guide-line" id="evaluationGuideRound1">
+          รอบที่ 1 : 1 ตุลาคม – 31 มีนาคม
+        </p>
+
+        <p class="evaluation-guide-line" id="evaluationGuideRound2">
+          รอบที่ 2 : 1 เมษายน – 30 กันยายน
+        </p>
+
+        <p class="evaluation-guide-current" id="evaluationGuideCurrent">
+          กรุณาเลือกปีและรอบการประเมิน
+        </p>
+      </div>
+
       <button type="submit" class="button primary wide">
         <i class="ph ph-magnifying-glass"></i>
         ค้นหาข้อมูลเลื่อนเงินเดือน
@@ -291,15 +359,13 @@
   <div id="resultArea" class="result-area" aria-live="polite"></div>
 </main>
 
-<!-- หน้าแอดมิน: เมนูทั้งหมดอยู่ด้านซ้าย -->
+<!-- หน้าแอดมินเดิม -->
 <main id="adminPage" class="admin-main hidden">
-
   <div id="sidebarBackdrop"
        class="admin-sidebar-backdrop hidden"
        aria-hidden="true"></div>
 
   <div class="admin-workspace">
-
     <aside id="adminSidebar"
            class="admin-sidebar"
            aria-label="เมนูจัดการระบบ">
@@ -316,7 +382,6 @@
 
       <p class="sidebar-section-label">เมนูหลัก</p>
 
-      <!-- รายการเมนูจะโหลดจาก main.js ตามเดิม -->
       <nav id="adminNav"
            class="nav"
            aria-label="เมนูด้านซ้าย"></nav>
@@ -330,12 +395,12 @@
     <section class="admin-area">
       <div class="admin-heading">
         <div class="admin-heading-title">
-
-          <button class="sidebar-toggle"
-                  type="button"
-                  id="sidebarToggle"
-                  aria-label="เปิดหรือปิดเมนู"
-                  aria-expanded="false">
+          <button
+            class="sidebar-toggle"
+            type="button"
+            id="sidebarToggle"
+            aria-label="เปิดหรือปิดเมนู"
+            aria-expanded="false">
             <i class="ph ph-list"></i>
           </button>
 
@@ -351,7 +416,6 @@
         </button>
       </div>
 
-      <!-- ฟังก์ชันทุกเมนูคงเดิม -->
       <div id="adminContent"></div>
     </section>
   </div>
@@ -362,11 +426,10 @@
 <div id="modalRoot"></div>
 <div id="toast" class="toast hidden" role="status"></div>
 
-<!-- ระบบ Firebase และ Google Drive เดิม -->
+<!-- ใช้ Firebase และ Drive ผ่าน main.js เดิม -->
 <script type="module" src="/src/main.js"></script>
 
 <script>
-/* ส่วนเสริมเฉพาะ index.html ไม่แก้ main.js */
 (() => {
   const sidebar = document.getElementById('adminSidebar');
   const backdrop = document.getElementById('sidebarBackdrop');
@@ -409,7 +472,7 @@
     if (event.key === 'Escape') setSidebar(false);
   });
 
-  /* เพิ่มไอคอนให้เมนูที่ main.js สร้าง */
+  // ตกแต่งเมนูแอดมินเดิม
   function decorateMenu() {
     nav.querySelectorAll('button[data-tab]').forEach(button => {
       if (button.querySelector('i')) return;
@@ -428,10 +491,7 @@
   new MutationObserver(decorateMenu)
     .observe(nav, { childList: true });
 
-  /*
-    เพิ่มปุ่มเลือกทั้งหมดในหน้าผู้เข้าร่วม
-    และส่ง change กลับไปยังระบบบันทึกเดิม
-  */
+  // เลือกผู้เข้าร่วมทั้งหมด - คงการทำงานเดิม
   function addSelectAll() {
     const checkboxes = [
       ...modalRoot.querySelectorAll('input[data-roster-person]')
@@ -464,9 +524,7 @@
       const n = checkboxes.filter(box => box.checked).length;
 
       all.checked = n === checkboxes.length;
-      all.indeterminate =
-        n > 0 && n < checkboxes.length;
-
+      all.indeterminate = n > 0 && n < checkboxes.length;
       count.textContent =
         'เลือกแล้ว ' + n + ' / ' + checkboxes.length + ' คน';
     }
@@ -477,8 +535,6 @@
       checkboxes.forEach(box => {
         if (box.checked !== checked) {
           box.checked = checked;
-
-          // แจ้งระบบเดิมเพื่อบันทึกรายชื่อได้ถูกต้อง
           box.dispatchEvent(
             new Event('change', { bubbles: true })
           );
@@ -501,6 +557,57 @@
       subtree: true
     });
 
+  // เพิ่มใหม่: เปลี่ยนคำแนะนำตามปีและรอบที่ครูเลือก
+  const yearSelect = document.getElementById('publicYear');
+  const roundSelect = document.getElementById('publicRound');
+  const line1 = document.getElementById('evaluationGuideRound1');
+  const line2 = document.getElementById('evaluationGuideRound2');
+  const current = document.getElementById('evaluationGuideCurrent');
+
+  function updateEvaluationGuide() {
+    const year = Number(yearSelect.value);
+    const round = Number(roundSelect.value);
+    const validYear =
+      Number.isInteger(year) && year >= 2400 && year <= 3000;
+
+    line1.textContent = validYear
+      ? `รอบที่ 1 : 1 ตุลาคม ${year - 1} – 31 มีนาคม ${year}`
+      : 'รอบที่ 1 : 1 ตุลาคม – 31 มีนาคม';
+
+    line2.textContent = validYear
+      ? `รอบที่ 2 : 1 เมษายน ${year} – 30 กันยายน ${year}`
+      : 'รอบที่ 2 : 1 เมษายน – 30 กันยายน';
+
+    line1.classList.toggle(
+      'active', validYear && round === 1
+    );
+
+    line2.classList.toggle(
+      'active', validYear && round === 2
+    );
+
+    current.textContent =
+      validYear && (round === 1 || round === 2)
+        ? `คุณกำลังเลือกผลการเลื่อนเงินเดือนครั้งที่ ${round} (${round === 1 ? '1 เมษายน' : '1 ตุลาคม'}) พ.ศ. ${year}`
+        : 'กรุณาเลือกปีและรอบการประเมิน';
+  }
+
+  yearSelect.addEventListener(
+    'change', updateEvaluationGuide
+  );
+
+  roundSelect.addEventListener(
+    'change', updateEvaluationGuide
+  );
+
+  // อัปเดตเมื่อ main.js โหลดปีและรอบที่เผยแพร่
+  new MutationObserver(updateEvaluationGuide)
+    .observe(yearSelect, { childList: true });
+
+  new MutationObserver(updateEvaluationGuide)
+    .observe(roundSelect, { childList: true });
+
+  updateEvaluationGuide();
 })();
 </script>
 
