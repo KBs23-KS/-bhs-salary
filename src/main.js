@@ -71,11 +71,43 @@ function renderAdmin(){$('adminNav').innerHTML=tabs.map(([id,n])=>`<button data-
  const c=$('adminContent');c.innerHTML=({dashboard:renderDashboard,teachers:renderTeachers,periods:renderRounds,docs:renderDocs,trash:renderTrash,logs:renderLogs,settings:renderSettings}[tab])();bindAdmin();}
 function renderDashboard(){const all=state.teachers.filter(t=>t.status!=='trash').length,published=state.periods.filter(p=>p.status==='published').length,docs=state.documents.filter(d=>d.current).length;return `<div class="metric-grid"><div class="metric"><strong>${all}</strong>ครูในระบบ</div><div class="metric"><strong>${published}</strong>รอบที่เผยแพร่</div><div class="metric"><strong>${docs}</strong>PDF เผยแพร่</div></div><div class="panel" style="margin-top:16px"><h3>เริ่มต้นใช้งาน</h3><div class="stack"><p>1. ตั้งค่า Firebase และล็อกอินแอดมิน</p><p>2. ไปที่ <b>ตั้งค่า</b> เพื่อเชื่อม Google Drive</p><p>3. เพิ่มครูหรืออัปโหลด Excel (ระบบสร้างรหัส PDF ให้ครั้งแรก)</p><p>4. สร้างปีและรอบ แล้วตรวจรายชื่อผู้เข้าร่วม</p><p>5. อัปโหลด PDF ตามชื่อครู แล้วกดเผยแพร่ทั้งรอบ</p></div></div><div class="notice">ระบบรุ่นเริ่มต้น: การสำรองรายวันสำรองข้อมูลประกอบเท่านั้น ยังไม่ใช่การสำรองไฟล์ PDF ครบชุดหรือการกู้คืนทั้งระบบแบบอัตโนมัติ</div>`;}
 const tag=(val,kind='')=>`<span class="tag ${kind}">${esc(val)}</span>`;
-function renderTeachers(){const arr=state.teachers.filter(t=>t.status!=='trash');return `<div class="panel"><div class="row between" style="flex-wrap:wrap"><h3>จัดการข้อมูลครู (${arr.length} คน)</h3><button id="addTeacher" class="button primary small">+ เพิ่มครู</button></div><div class="table-scroll"><table><thead><tr><th>เลขประชาชน</th><th>ชื่อ - นามสกุล</th><th>ตำแหน่ง</th><th>กลุ่มสาระฯ</th><th>สถานะ</th><th>จัดการ</th></tr></thead><tbody>${arr.map(t=>`<tr><td>${esc(t.nationalId?.slice(0,3))}•••••••${esc(t.nationalId?.slice(-3))}</td><td><b>${esc(t.name)}</b></td><td>${esc(t.position)}</td><td>${esc(t.dept)}</td><td>${tag(statusName[t.status]||t.status,t.status==='active'?'green':'amber')}</td><td class="nowrap"><button data-edit="${t.key}" class="button light small">แก้ไข</button> <button data-pin="${t.key}" class="button light small">รหัส PDF</button> <button data-delteacher="${t.key}" class="button danger small">ลบ</button></td></tr>`).join('')}</tbody></table></div></div><div class="panel"><h3>นำเข้ารายชื่อจาก Excel (.xlsx) หรือ CSV</h3><div class="row" style="flex-wrap:wrap"><input id="excelFile" type="file" accept=".xlsx,.csv" class="field" style="max-width:440px"><button id="excelPreview" class="button light">ตรวจสอบก่อนนำเข้า</button></div><p class="muted small-text">คอลัมน์: เลขประจำตัวประชาชน, ชื่อ - นามสกุล, ตำแหน่ง, กลุ่มสาระฯ (Excel ให้ตั้งเลขประชาชนเป็นข้อความ)</p><a href="/teachers-template.csv" download>โหลดตัวอย่าง CSV</a></div>`;}
+function renderTeachers(){const arr=state.teachers.filter(t=>t.status!=='trash');return `<div class="panel"><div class="row between" style="flex-wrap:wrap"><h3>จัดการข้อมูลครู (${arr.length} คน)</h3><button id="addTeacher" class="button primary small">+ เพิ่มครู</button></div><div class="table-scroll"><table><thead><tr><th>เลขประชาชน</th><th>ชื่อ - นามสกุล</th><th>ตำแหน่ง</th><th>กลุ่มสาระฯ</th><th>สถานะ</th><th>จัดการ</th></tr></thead><tbody>${arr.map(t=>`<tr><td>${esc(t.nationalId?.slice(0,3))}•••••••${esc(t.nationalId?.slice(-3))}</td><td><b>${esc(t.name)}</b></td><td>${esc(t.position)}</td><td>${esc(t.dept)}</td><td>${tag(statusName[t.status]||t.status,t.status==='active'?'green':'amber')}</td><td class="nowrap"><button data-edit="${t.key}" class="button light small">แก้ไข</button> <button data-view-pin="${t.key}" class="button light small">👁 ดูรหัส PDF</button> <button data-pin="${t.key}" class="button light small">ตั้งรหัส PDF</button> <button data-delteacher="${t.key}" class="button danger small">ลบ</button></td></tr>`).join('')}</tbody></table></div></div><div class="panel"><h3>นำเข้ารายชื่อจาก Excel (.xlsx) หรือ CSV</h3><div class="row" style="flex-wrap:wrap"><input id="excelFile" type="file" accept=".xlsx,.csv" class="field" style="max-width:440px"><button id="excelPreview" class="button light">ตรวจสอบก่อนนำเข้า</button></div><p class="muted small-text">คอลัมน์: เลขประจำตัวประชาชน, ชื่อ - นามสกุล, ตำแหน่ง, กลุ่มสาระฯ (Excel ให้ตั้งเลขประชาชนเป็นข้อความ)</p><a href="/teachers-template.csv" download>โหลดตัวอย่าง CSV</a></div>`;}
 function teacherDialog(t){modal(`${modalHead(t?'แก้ไขข้อมูลครู':'เพิ่มข้อมูลครู')}<form id="teacherForm" class="stack"><label>เลขประจำตัวประชาชน<input class="field" name="nationalId" maxlength="13" inputmode="numeric" required value="${esc(t?.nationalId||'')}" ${t?'readonly':''}></label><label>ชื่อ - นามสกุล<input class="field" name="name" required value="${esc(t?.name||'')}"></label><label>ตำแหน่ง<input class="field" name="position" required value="${esc(t?.position||'')}"></label><label>กลุ่มสาระฯ<input class="field" name="dept" required value="${esc(t?.dept||'')}"></label><label>สถานะ<select class="field" name="status">${Object.entries(statusName).filter(([k])=>k!=='trash').map(([k,v])=>`<option value="${k}" ${t?.status===k?'selected':''}>${v}</option>`).join('')}</select></label><label class="checkbox-row"><input name="allowFormerAccess" type="checkbox" ${t?.allowFormerAccess?'checked':''}>อนุญาตผู้ที่ย้ายออกเปิดเอกสารย้อนหลัง</label>${t?'':'<label>รหัสเปิด PDF (เว้นว่างให้ระบบสุ่มอัตโนมัติ)<input class="field" name="pin" autocomplete="off" minlength="8" maxlength="64"></label>'}<button class="button primary wide">บันทึกข้อมูล</button></form>`);
  $('teacherForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);const data=Object.fromEntries(f.entries());data.allowFormerAccess=f.has('allowFormerAccess');try{const r=await admin('teacherSave',data);closeModal();await reload();if(r.pin)alert(`รหัสเปิด PDF สำหรับครูคนนี้ (แสดงครั้งเดียว):\n${r.pin}\nกรุณาแจ้งครูอย่างปลอดภัย`);toast('บันทึกข้อมูลครูสำเร็จ');}catch(err){toast(err.message);}};}
-function resetPin(t){modal(`${modalHead('ตั้งรหัส PDF ใหม่')}<p>ครู: <b>${esc(t.name)}</b></p><p class="notice">เมื่อเปลี่ยนรหัสใหม่ รหัสเดิมจะใช้ไม่ได้อีก ระบบไม่สามารถดูรหัสเดิมย้อนหลังได้</p><form id="pinResetForm" class="stack"><label>รหัสใหม่ (อย่างน้อย 8 ตัว) หรือเว้นว่างให้สุ่ม<input name="pin" class="field" autocomplete="off" minlength="8" maxlength="64"></label><button class="button primary">ยืนยันเปลี่ยนรหัส</button></form>`);
- $('pinResetForm').onsubmit=async e=>{e.preventDefault();try{const r=await admin('pinReset',{teacherKey:t.key,pin:e.target.elements.namedItem('pin').value});closeModal();alert(`รหัสใหม่ของ ${t.name} (แสดงครั้งเดียว):\n${r.pin}`);toast('เปลี่ยนรหัสแล้ว');}catch(er){toast(er.message);}};}
+async function revealPin(t){
+ try {
+  const r=await admin('pinReveal',{teacherKey:t.key});
+
+  if(!r.available){
+    return modal(`${modalHead('ดูรหัสผ่าน PDF')}<p>ครู: <b>${esc(t.name)}</b></p><p class="notice">รหัสเดิมถูกเก็บเป็นแฮช จึงไม่สามารถแสดงย้อนหลังได้ กรุณากด "ตั้งรหัส PDF" ในรายการครูเพื่อกำหนดรหัสใหม่หนึ่งครั้ง หลังจากนั้นสามารถกลับมาดูรหัสใหม่ได้</p>`);
+  }
+
+  modal(`${modalHead('ดูรหัสผ่าน PDF')}<p>ครู: <b>${esc(t.name)}</b></p><p class="muted small-text">รหัสนี้เป็นข้อมูลลับสำหรับเปิดเอกสารเงินเดือน กรุณาอย่าเปิดบนอุปกรณ์สาธารณะ</p><label>รหัส PDF<input id="pdfPinValue" class="field" type="password" readonly autocomplete="off" spellcheck="false"></label><div class="row" style="margin-top:12px;flex-wrap:wrap"><button type="button" id="pdfPinToggle" class="button light">แสดงรหัส</button><button type="button" id="pdfPinCopy" class="button primary">คัดลอกรหัส</button></div>`);
+
+  const input=$('pdfPinValue');
+  input.value=r.pin;
+
+  $('pdfPinToggle').onclick=()=>{
+    const show=input.type==='password';
+    input.type=show?'text':'password';
+    $('pdfPinToggle').textContent=show?'ซ่อนรหัส':'แสดงรหัส';
+  };
+
+  $('pdfPinCopy').onclick=async()=>{
+    try {
+      await navigator.clipboard.writeText(input.value);
+      toast('คัดลอกรหัสแล้ว กรุณาส่งให้ครูอย่างปลอดภัย');
+    } catch {
+      toast('เบราว์เซอร์ไม่อนุญาตให้คัดลอก กรุณาแสดงรหัสแล้วคัดลอกด้วยตนเอง');
+    }
+  };
+ } catch(e) {
+  toast(e.message);
+ }
+}
+
+function resetPin(t){modal(`${modalHead('ตั้งรหัส PDF ใหม่')}<p>ครู: <b>${esc(t.name)}</b></p><p class="notice">เมื่อเปลี่ยนรหัสใหม่ รหัสเดิมจะใช้ไม่ได้อีก และแอดมินสามารถกลับมาดูรหัสใหม่ย้อนหลังได้</p><form id="pinResetForm" class="stack"><label>รหัสใหม่ (อย่างน้อย 8 ตัว) หรือเว้นว่างให้สุ่ม<input name="pin" class="field" autocomplete="off" minlength="8" maxlength="64"></label><button class="button primary">ยืนยันเปลี่ยนรหัส</button></form>`);
+ $('pinResetForm').onsubmit=async e=>{e.preventDefault();try{const r=await admin('pinReset',{teacherKey:t.key,pin:e.target.elements.namedItem('pin').value});closeModal();alert(`รหัสใหม่ของ ${t.name}:\n${r.pin}\nสามารถกลับมาดูย้อนหลังในหน้าจัดการข้อมูลครูได้`);toast('เปลี่ยนรหัสแล้ว');}catch(er){toast(er.message);}};}
 function csvFields(line){const out=[];let cur='',quoted=false;for(let i=0;i<line.length;i++){const c=line[i];if(c==='"'){if(quoted&&line[i+1]==='"'){cur+='"';i++;}else quoted=!quoted;}else if(c===','&&!quoted){out.push(cur);cur='';}else cur+=c;}out.push(cur);return out;}
 async function readTeachers(file){let rows;if(file.name.toLowerCase().endsWith('.csv')){rows=(await file.text()).replace(/^\uFEFF/,'').split(/\r?\n/).filter(x=>x.trim()).map(csvFields);}else rows=await readXlsxFile(file);if(rows.length<2)throw Error('ไม่พบข้อมูล');
  const aliases=[['เลขประจำตัวประชาชน','เลขบัตรประชาชน'],['ชื่อ - นามสกุล','ชื่อ-นามสกุล'],['ตำแหน่ง'],['กลุ่มสาระฯ','กลุ่มสาระ']];
@@ -124,6 +156,7 @@ function bindAdmin(){
  $('addTeacher')?.addEventListener('click',()=>teacherDialog());
  document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>teacherDialog(member(b.dataset.edit)));
  document.querySelectorAll('[data-pin]').forEach(b=>b.onclick=()=>resetPin(member(b.dataset.pin)));
+ document.querySelectorAll('[data-view-pin]').forEach(b=>b.onclick=()=>revealPin(member(b.dataset.viewPin)));
  document.querySelectorAll('[data-delteacher]').forEach(b=>b.onclick=async()=>{if(!confirm('ย้ายข้อมูลครูไปถังขยะ? จะระงับการเข้าถึงเอกสารทันที'))return;try{await admin('trashTeacher',{teacherKey:b.dataset.delteacher});await reload();}catch(e){toast(e.message);}});
  $('excelPreview')?.addEventListener('click',previewImport);
  $('addRound')?.addEventListener('click',createRoundDialog);

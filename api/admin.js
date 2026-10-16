@@ -1,5 +1,5 @@
 import {randomBytes} from 'node:crypto';
-import {db,requireAdmin,startSession,endSession,audit,onlyMethod,json,fail,error,teacherKey,nationalIdOk,periodKey,documentKey,hashPin,newPin,safeText,googleDrive,ensureFolders,oauth,backupSnapshot,timestamp} from './_lib.js';
+import {db,requireAdmin,startSession,endSession,audit,onlyMethod,json,fail,error,teacherKey,nationalIdOk,periodKey,documentKey,hashPin,newPin,encryptPdfPin,decryptPdfPin,safeText,googleDrive,ensureFolders,oauth,backupSnapshot,timestamp} from './_lib.js';
 const statuses=['active','moved','resigned','retired'];
 async function getAll(){
  const [teachers,periods,documents,trash,audits,drive]=await Promise.all([
@@ -7,7 +7,7 @@ async function getAll(){
    db().collection('trash').limit(200).get(),db().collection('audit_logs').orderBy('at','desc').limit(150).get(),db().doc('settings/drive').get()
  ]);
  const entries=s=>s.docs.map(d=>({key:d.id,...d.data()}));
- return {teachers:entries(teachers).map(({pin,...t})=>({...t,pinSet:!!pin})),periods:entries(periods),documents:entries(documents),trash:entries(trash),audits:entries(audits),driveConnected:!!drive.data()?.folderId};
+ return {teachers:entries(teachers).map(({pin,pinEnc,...t})=>({...t,pinSet:!!pin,pinViewable:!!pinEnc})),periods:entries(periods),documents:entries(documents),trash:entries(trash),audits:entries(audits),driveConnected:!!drive.data()?.folderId};
 }
 function validatePerson(input){
  const nationalId=String(input.nationalId??'').trim(),name=safeText(input.name),position=safeText(input.position),dept=safeText(input.dept);
@@ -20,8 +20,8 @@ async function saveTeacher(b){
  const status=statuses.includes(b.status)?b.status:(old?.status||'active');
  const update={nationalId:p.nationalId,name:p.name,position:p.position,dept:p.dept,status,allowFormerAccess:b.allowFormerAccess===undefined?(old?.allowFormerAccess??false):!!b.allowFormerAccess,updatedAt:timestamp()};
  let pin;
- if(b.pin){pin=String(b.pin);update.pin=hashPin(pin);}
- else if(!old?.pin){pin=newPin();update.pin=hashPin(pin);}
+ if(b.pin){pin=String(b.pin);update.pin=hashPin(pin);update.pinEnc=encryptPdfPin(pin,key);}
+ else if(!old?.pin){pin=newPin();update.pin=hashPin(pin);update.pinEnc=encryptPdfPin(pin,key);}
  if(!old) update.createdAt=timestamp();
  await ref.set(update,{merge:true});
  await audit(old?'แก้ไขครู':'เพิ่มครู',{teacherKey:key,old:old?{name:old.name,position:old.position,dept:old.dept,status:old.status}:null,now:{name:p.name,position:p.position,dept:p.dept,status}});
@@ -40,7 +40,7 @@ async function importTeachers(rows){
   let pin=null;
   if(changed){
     const update={...p,updatedAt:timestamp()};
-    if(!old) {pin=newPin();update.pin=hashPin(pin);update.status='active';update.allowFormerAccess=false;update.createdAt=timestamp();}
+    if(!old) {pin=newPin();update.pin=hashPin(pin);update.pinEnc=encryptPdfPin(pin,key);update.status='active';update.allowFormerAccess=false;update.createdAt=timestamp();}
     await ref.set(update,{merge:true});
   }
   results.push({name:p.name,nationalId:p.nationalId,status:old?(changed?'updated':'same'):'added',pin});
@@ -171,7 +171,27 @@ export default async function handler(req,res){
    case 'teacherImport':out={results:await importTeachers(b.rows)};break;
    case 'pinReset':{
       const key=String(b.teacherKey),ref=db().doc(`teachers/${key}`),sn=await ref.get();if(!sn.exists)throw error('ไม่พบครู');
-      const pin=b.pin?String(b.pin):newPin();await ref.update({pin:hashPin(pin)});await audit('ตั้งรหัส PDF ใหม่',{teacherKey:key});out={pin};break;
+      const pin=b.pin?String(b.pin):newPin();await ref.update({pin:hashPin(pin),pinEnc:encryptPdfPin(pin,key)});await audit('ตั้งรหัส PDF ใหม่',{teacherKey:key});out={pin};break;
+   }
+   case 'pinReveal':{
+      const key=String(b.teacherKey||'');
+      if(!/^[a-f0-9]{64}$/.test(key))
+        throw error('ข้อมูลครูไม่ถูกต้อง');
+
+      const sn=await db().doc(`teachers/${key}`).get();
+      if(!sn.exists||sn.data()?.status==='trash')
+        throw error('ไม่พบครูในรายการ',404);
+
+      const pinEnc=sn.data()?.pinEnc;
+      if(!pinEnc){
+        out={available:false};
+        break;
+      }
+
+      const pin=decryptPdfPin(pinEnc,key);
+      await audit('เปิดดูรหัส PDF',{teacherKey:key});
+      out={available:true,pin};
+      break;
    }
    case 'periodCreate':out=await makePeriod(b);break;
    case 'rosterSave':out=await changeRoster(b);break;

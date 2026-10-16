@@ -1,4 +1,4 @@
-import { randomBytes, createHash, createHmac, scryptSync, timingSafeEqual, createCipheriv, createDecipheriv } from 'node:crypto';
+import { randomBytes, createHash, createHmac, hkdfSync, scryptSync, timingSafeEqual, createCipheriv, createDecipheriv } from 'node:crypto';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
@@ -101,6 +101,50 @@ export function decrypt(value) {
   decipher.setAuthTag(Buffer.from(tag,'base64'));
   return Buffer.concat([decipher.update(Buffer.from(payload,'base64')),decipher.final()]).toString('utf8');
 }
+// A separate AES-GCM key derived from the existing server key.
+// Keep DRIVE_TOKEN_KEY_BASE64 unchanged to preserve encrypted PINs.
+function pdfPinKey() {
+  return Buffer.from(hkdfSync('sha256', key32(),
+    Buffer.from('BHS-Salary/pin-storage/v1/salt'),
+    Buffer.from('BHS-Salary/PDF-PIN-AES256-GCM/v1'), 32));
+}
+
+export function encryptPdfPin(pin, teacherId) {
+  const iv=randomBytes(12);
+  const cipher=createCipheriv('aes-256-gcm',pdfPinKey(),iv);
+  cipher.setAAD(Buffer.from(String(teacherId),'utf8'));
+  const payload=Buffer.concat([
+    cipher.update(pin,'utf8'),cipher.final()
+  ]);
+  return `v1.${iv.toString('base64url')}.${cipher.getAuthTag().toString('base64url')}.${payload.toString('base64url')}`;
+}
+
+export function decryptPdfPin(value, teacherId) {
+  const parts=String(value||'').split('.');
+  if(parts.length!==4||parts[0]!=='v1')
+    throw error('ไม่พบรหัส PDF ที่เปิดดูย้อนหลังได้',409);
+
+  try {
+    const iv=Buffer.from(parts[1],'base64url');
+    const tag=Buffer.from(parts[2],'base64url');
+    if(iv.length!==12||tag.length!==16)
+      throw Error('Invalid encrypted PIN');
+
+    const decipher=createDecipheriv(
+      'aes-256-gcm',pdfPinKey(),iv
+    );
+    decipher.setAAD(Buffer.from(String(teacherId),'utf8'));
+    decipher.setAuthTag(tag);
+
+    return Buffer.concat([
+      decipher.update(Buffer.from(parts[3],'base64url')),
+      decipher.final()
+    ]).toString('utf8');
+  } catch {
+    throw error('ไม่สามารถถอดรหัส PDF ได้ กรุณาตรวจสอบกุญแจเข้ารหัสบน Vercel',409);
+  }
+}
+
 export function oauth() { return new google.auth.OAuth2(required('GOOGLE_CLIENT_ID'),required('GOOGLE_CLIENT_SECRET'),required('GOOGLE_REDIRECT_URI')); }
 export async function googleDrive() {
   const snap=await db().doc('settings/drive').get();
@@ -136,8 +180,8 @@ export async function backupSnapshot() {
   const names=['teachers','periods','documents','trash','audit_logs'];
   const collections={};
   for(const name of names) collections[name]=(await db().collection(name).get()).docs.map(x=>({id:x.id,...x.data()}));
-  // Never export live PIN hashes or admin Google OAuth secrets into general-purpose backups.
-  collections.teachers=collections.teachers.map(({pin,...t})=>t);
+  // Never export PDF PIN hashes, reversible ciphertext, or admin Google OAuth secrets into general-purpose backups.
+  collections.teachers=collections.teachers.map(({pin,pinEnc,...t})=>t);
   const name=`firestore-metadata-${new Date().toISOString().replace(/[.:]/g,'-')}.json`;
   await storeDriveJSON(name,{createdAt:timestamp(),notice:'Metadata-only backup, does not include actual PDF bytes or password hashes; not a full disaster recovery backup.',collections});
   return name;
