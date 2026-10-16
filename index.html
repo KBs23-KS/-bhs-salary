@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="th"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+<title>ระบบแจ้งผลพิจารณาเลื่อนเงินเดือน โรงเรียนบ้านแฮดศึกษา</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.2/src/regular/style.css">
+<link rel="stylesheet" href="./src/style.css">
+</head><body>
+<header class="header"><div class="header-inside">
+<div class="brand-icon"><i class="ph ph-buildings"></i></div>
+<div class="branding"><h1>โรงเรียนบ้านแฮดศึกษา</h1><p>ระบบแจ้งผลพิจารณาเลื่อนเงินเดือน</p></div>
+<button type="button" id="adminTop" class="admin-link"><i class="ph ph-lock-key"></i> <span id="adminTopLabel">แอดมิน</span></button>
+</div></header>
+<main id="publicPage" class="public-main">
+<section class="search-card"><div class="round-blur blur1"></div><div class="round-blur blur2"></div>
+<div class="search-intro"><div class="fingerprint"><i class="ph ph-fingerprint"></i></div>
+<h2>ตรวจสอบข้อมูลส่วนบุคคล</h2><p>กรุณากรอกเลขประจำตัวประชาชน 13 หลัก</p></div>
+<form id="searchForm" class="search-form"><div class="id-wrap"><i class="ph ph-identification-card"></i>
+<input type="text" id="nationalId" maxlength="13" inputmode="numeric" autocomplete="off" placeholder="กรอกรหัส 13 หลักที่นี่" required></div>
+<div class="two"><label>ปี พ.ศ.<select id="publicYear" class="field" required></select></label><label>รอบการประเมิน<select id="publicRound" class="field" required></select></label></div>
+<button type="submit" class="button primary wide"><i class="ph ph-magnifying-glass"></i> ค้นหาข้อมูลเลื่อนเงินเดือน</button></form></section>
+<div id="resultArea" class="result-area" aria-live="polite"></div></main>
+<main id="adminPage" class="admin-main hidden"><div class="admin-heading"><div><h2>หน้าบริหารจัดการ</h2><p>ระบบข้อมูลครูและเอกสาร PDF</p></div><button class="button light" id="logoutBtn"><i class="ph ph-sign-out"></i> ออกจากระบบ</button></div>
+<div id="adminNav" class="nav"></div><div id="adminContent"></div></main>
+<footer>© 2026 โรงเรียนบ้านแฮดศึกษา</footer>
+<div id="modalRoot"></div><div id="toast" class="toast hidden" role="status"></div>
+<script type="module" src="/src/main.js"></script>
+</body></html>

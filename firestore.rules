@@ -1,0 +1,7 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // No browser access. Firebase Admin SDK (Vercel server) alone reads/writes.
+    match /{document=**} { allow read, write: if false; }
+  }
+}
