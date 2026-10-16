@@ -1,0 +1,264 @@
+
+name: BHS - Enable PDF PIN viewer
+
+on:
+  push:
+    paths:
+      - .github/workflows/bhs-pin-view-update.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-pdf-pin-view:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout school website
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply PDF PIN viewer update
+        shell: bash
+        run: |
+          python3 - <<'PYCODE'
+          from pathlib import Path
+
+          def replace_once(path, before, after):
+              data=path.read_text(encoding='utf-8')
+              if after in data:
+                  print(f'Already updated: {path}')
+                  return
+              found=data.count(before)
+              if found!=1:
+                  raise RuntimeError(
+                      f'Expected one source match, got {found}: {path}: {before[:125]!r}'
+                  )
+              path.write_text(data.replace(before,after),encoding='utf-8')
+
+          lib=Path('api/_lib.js')
+          admin=Path('api/admin.js')
+          main=Path('src/main.js')
+
+          for f in (lib,admin,main):
+              if not f.is_file():
+                  raise RuntimeError(f'Missing source file: {f}')
+
+          # Secure encryption utilities, using a derived server-only key.
+          replace_once(
+              lib,
+              "import { randomBytes, createHash, createHmac, scryptSync, timingSafeEqual, createCipheriv, createDecipheriv } from 'node:crypto';",
+              "import { randomBytes, createHash, createHmac, hkdfSync, scryptSync, timingSafeEqual, createCipheriv, createDecipheriv } from 'node:crypto';"
+          )
+
+          replace_once(
+              lib,
+              "export function oauth() {",
+              """// A separate AES-GCM key derived from the existing server key.
+          // Keep DRIVE_TOKEN_KEY_BASE64 unchanged to preserve encrypted PINs.
+          function pdfPinKey() {
+            return Buffer.from(hkdfSync('sha256', key32(),
+              Buffer.from('BHS-Salary/pin-storage/v1/salt'),
+              Buffer.from('BHS-Salary/PDF-PIN-AES256-GCM/v1'), 32));
+          }
+
+          export function encryptPdfPin(pin, teacherId) {
+            const iv=randomBytes(12);
+            const cipher=createCipheriv('aes-256-gcm',pdfPinKey(),iv);
+            cipher.setAAD(Buffer.from(String(teacherId),'utf8'));
+            const payload=Buffer.concat([
+              cipher.update(pin,'utf8'),cipher.final()
+            ]);
+            return `v1.${iv.toString('base64url')}.${cipher.getAuthTag().toString('base64url')}.${payload.toString('base64url')}`;
+          }
+
+          export function decryptPdfPin(value, teacherId) {
+            const parts=String(value||'').split('.');
+            if(parts.length!==4||parts[0]!=='v1')
+              throw error('ไม่พบรหัส PDF ที่เปิดดูย้อนหลังได้',409);
+
+            try {
+              const iv=Buffer.from(parts[1],'base64url');
+              const tag=Buffer.from(parts[2],'base64url');
+              if(iv.length!==12||tag.length!==16)
+                throw Error('Invalid encrypted PIN');
+
+              const decipher=createDecipheriv(
+                'aes-256-gcm',pdfPinKey(),iv
+              );
+              decipher.setAAD(Buffer.from(String(teacherId),'utf8'));
+              decipher.setAuthTag(tag);
+
+              return Buffer.concat([
+                decipher.update(Buffer.from(parts[3],'base64url')),
+                decipher.final()
+              ]).toString('utf8');
+            } catch {
+              throw error('ไม่สามารถถอดรหัส PDF ได้ กรุณาตรวจสอบกุญแจเข้ารหัสบน Vercel',409);
+            }
+          }
+
+          export function oauth() {"""
+          )
+
+          # Keep PIN ciphertext out of ordinary metadata backups.
+          replace_once(
+              lib,
+              "collections.teachers=collections.teachers.map(({pin,...t})=>t);",
+              "collections.teachers=collections.teachers.map(({pin,pinEnc,...t})=>t);"
+          )
+
+          replace_once(
+              lib,
+              "// Never export live PIN hashes or admin Google OAuth secrets into general-purpose backups.",
+              "// Never export PDF PIN hashes, reversible ciphertext, or admin Google OAuth secrets into general-purpose backups."
+          )
+
+          # Backend: store hashes and encrypted copies together.
+          replace_once(
+              admin,
+              "hashPin,newPin,safeText,googleDrive",
+              "hashPin,newPin,encryptPdfPin,decryptPdfPin,safeText,googleDrive"
+          )
+
+          replace_once(
+              admin,
+              "teachers:entries(teachers).map(({pin,...t})=>({...t,pinSet:!!pin}))",
+              "teachers:entries(teachers).map(({pin,pinEnc,...t})=>({...t,pinSet:!!pin,pinViewable:!!pinEnc}))"
+          )
+
+          replace_once(
+              admin,
+              "if(b.pin){pin=String(b.pin);update.pin=hashPin(pin);}\n else if(!old?.pin){pin=newPin();update.pin=hashPin(pin);}",
+              "if(b.pin){pin=String(b.pin);update.pin=hashPin(pin);update.pinEnc=encryptPdfPin(pin,key);}\n else if(!old?.pin){pin=newPin();update.pin=hashPin(pin);update.pinEnc=encryptPdfPin(pin,key);}"
+          )
+
+          replace_once(
+              admin,
+              "if(!old) {pin=newPin();update.pin=hashPin(pin);update.status='active';",
+              "if(!old) {pin=newPin();update.pin=hashPin(pin);update.pinEnc=encryptPdfPin(pin,key);update.status='active';"
+          )
+
+          replace_once(
+              admin,
+              "const pin=b.pin?String(b.pin):newPin();await ref.update({pin:hashPin(pin)});await audit('ตั้งรหัส PDF ใหม่',{teacherKey:key});out={pin};break;",
+              "const pin=b.pin?String(b.pin):newPin();await ref.update({pin:hashPin(pin),pinEnc:encryptPdfPin(pin,key)});await audit('ตั้งรหัส PDF ใหม่',{teacherKey:key});out={pin};break;"
+          )
+
+          # New admin-only operation for revealing an individual PIN.
+          replace_once(
+              admin,
+              "   case 'periodCreate':out=await makePeriod(b);break;",
+              """   case 'pinReveal':{
+                const key=String(b.teacherKey||'');
+                if(!/^[a-f0-9]{64}$/.test(key))
+                  throw error('ข้อมูลครูไม่ถูกต้อง');
+
+                const sn=await db().doc(`teachers/${key}`).get();
+                if(!sn.exists||sn.data()?.status==='trash')
+                  throw error('ไม่พบครูในรายการ',404);
+
+                const pinEnc=sn.data()?.pinEnc;
+                if(!pinEnc){
+                  out={available:false};
+                  break;
+                }
+
+                const pin=decryptPdfPin(pinEnc,key);
+                await audit('เปิดดูรหัส PDF',{teacherKey:key});
+                out={available:true,pin};
+                break;
+             }
+             case 'periodCreate':out=await makePeriod(b);break;"""
+          )
+
+          # Add the view button beside each teacher's existing PIN control.
+          replace_once(
+              main,
+              '<button data-pin="${t.key}" class="button light small">รหัส PDF</button>',
+              '<button data-view-pin="${t.key}" class="button light small">👁 ดูรหัส PDF</button> <button data-pin="${t.key}" class="button light small">ตั้งรหัส PDF</button>'
+          )
+
+          # Show PIN in a private modal only after an explicit admin click.
+          replace_once(
+              main,
+              "function resetPin(t){",
+              """async function revealPin(t){
+           try {
+            const r=await admin('pinReveal',{teacherKey:t.key});
+
+            if(!r.available){
+              return modal(`${modalHead('ดูรหัสผ่าน PDF')}<p>ครู: <b>${esc(t.name)}</b></p><p class="notice">รหัสเดิมถูกเก็บเป็นแฮช จึงไม่สามารถแสดงย้อนหลังได้ กรุณากด "ตั้งรหัส PDF" ในรายการครูเพื่อกำหนดรหัสใหม่หนึ่งครั้ง หลังจากนั้นสามารถกลับมาดูรหัสใหม่ได้</p>`);
+            }
+
+            modal(`${modalHead('ดูรหัสผ่าน PDF')}<p>ครู: <b>${esc(t.name)}</b></p><p class="muted small-text">รหัสนี้เป็นข้อมูลลับสำหรับเปิดเอกสารเงินเดือน กรุณาอย่าเปิดบนอุปกรณ์สาธารณะ</p><label>รหัส PDF<input id="pdfPinValue" class="field" type="password" readonly autocomplete="off" spellcheck="false"></label><div class="row" style="margin-top:12px;flex-wrap:wrap"><button type="button" id="pdfPinToggle" class="button light">แสดงรหัส</button><button type="button" id="pdfPinCopy" class="button primary">คัดลอกรหัส</button></div>`);
+
+            const input=$('pdfPinValue');
+            input.value=r.pin;
+
+            $('pdfPinToggle').onclick=()=>{
+              const show=input.type==='password';
+              input.type=show?'text':'password';
+              $('pdfPinToggle').textContent=show?'ซ่อนรหัส':'แสดงรหัส';
+            };
+
+            $('pdfPinCopy').onclick=async()=>{
+              try {
+                await navigator.clipboard.writeText(input.value);
+                toast('คัดลอกรหัสแล้ว กรุณาส่งให้ครูอย่างปลอดภัย');
+              } catch {
+                toast('เบราว์เซอร์ไม่อนุญาตให้คัดลอก กรุณาแสดงรหัสแล้วคัดลอกด้วยตนเอง');
+              }
+            };
+           } catch(e) {
+            toast(e.message);
+           }
+          }
+
+          function resetPin(t){"""
+          )
+
+          replace_once(
+              main,
+              "เมื่อเปลี่ยนรหัสใหม่ รหัสเดิมจะใช้ไม่ได้อีก ระบบไม่สามารถดูรหัสเดิมย้อนหลังได้",
+              "เมื่อเปลี่ยนรหัสใหม่ รหัสเดิมจะใช้ไม่ได้อีก และแอดมินสามารถกลับมาดูรหัสใหม่ย้อนหลังได้"
+          )
+
+          replace_once(
+              main,
+              "alert(`รหัสใหม่ของ ${t.name} (แสดงครั้งเดียว):\\n${r.pin}`)",
+              "alert(`รหัสใหม่ของ ${t.name}:\\n${r.pin}\\nสามารถกลับมาดูย้อนหลังในหน้าจัดการข้อมูลครูได้`)"
+          )
+
+          replace_once(
+              main,
+              "document.querySelectorAll('[data-pin]').forEach(b=>b.onclick=()=>resetPin(member(b.dataset.pin)));",
+              "document.querySelectorAll('[data-pin]').forEach(b=>b.onclick=()=>resetPin(member(b.dataset.pin)));\n document.querySelectorAll('[data-view-pin]').forEach(b=>b.onclick=()=>revealPin(member(b.dataset.viewPin)));"
+          )
+
+          print('PDF PIN viewer update completed.')
+          PYCODE
+
+      - name: Check JavaScript syntax
+        shell: bash
+        run: |
+          node --check api/_lib.js
+          node --check api/admin.js
+          node --check src/main.js
+
+      - name: Commit updated source files
+        shell: bash
+        run: |
+          git add -- api/_lib.js api/admin.js src/main.js
+
+          if git diff --cached --quiet; then
+            echo "No further change needed."
+            exit 0
+          fi
+
+          git config user.name "$(git log -1 --format=%an)"
+          git config user.email "$(git log -1 --format=%ae)"
+
+          git commit -m "Enable admin PDF PIN viewer"
+          git push origin "HEAD:${{ github.ref_name }}"
