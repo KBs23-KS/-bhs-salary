@@ -1,231 +1,52 @@
 
 <!doctype html>
-<html lang="th">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="th"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="referrer" content="no-referrer">
 <title>ระบบแจ้งผลพิจารณาเลื่อนเงินเดือน โรงเรียนบ้านแฮดศึกษา</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.2/src/regular/style.css">
 <link rel="stylesheet" href="./src/style.css">
 
 <style>
-/* รูปแบบหน้าแอดมินเดิม */
-#adminPage.admin-main {
-  max-width:none;
-  width:100%;
-  margin:0;
-  padding:0;
+/* เพิ่มรูปแบบเฉพาะหน้าแอดมินเท่านั้น */
+#adminPage.admin-main{max-width:none;width:100%;margin:0;padding:0}
+#adminPage .admin-workspace{display:flex;align-items:stretch;min-height:calc(100vh - 153px)}
+#adminPage .admin-sidebar{width:255px;flex:0 0 255px;background:linear-gradient(165deg,#0f172a 0%,#1e2254 55%,#29256a 100%);color:#e0e7ff;box-shadow:5px 0 22px #1e293b16;display:flex;flex-direction:column;padding:26px 14px 20px}
+#adminPage .sidebar-logo{display:flex;align-items:center;gap:12px;color:#fff;padding:2px 10px 28px}
+#adminPage .sidebar-mark{display:grid;place-items:center;width:43px;height:43px;border-radius:13px;background:linear-gradient(135deg,#818cf8,#3b82f6);font-size:26px}
+#adminPage .sidebar-logo strong{display:block;font-size:17px;letter-spacing:.05em}
+#adminPage .sidebar-logo small{display:block;font-size:12px;color:#c7d2fe;margin-top:2px}
+#adminPage .sidebar-section-label{font-size:11px;font-weight:800;letter-spacing:.09em;color:#a5b4fc;padding:0 15px;margin:0 0 10px}
+#adminPage #adminNav.nav{display:flex;flex-direction:column;gap:5px;overflow:visible;margin:0;padding:0}
+#adminPage #adminNav button{width:100%;min-height:46px;display:flex;align-items:center;text-align:left;gap:12px;padding:12px 14px;color:#dbe4ff;border:1px solid transparent;border-radius:12px;background:transparent;font-weight:700;white-space:normal;transition:background .18s ease,color .18s ease}
+#adminPage #adminNav button:hover{background:#ffffff18;color:white}
+#adminPage #adminNav button.selected{background:linear-gradient(105deg,#4f46e5,#6366f1);color:white;border-color:#a5b4fc66;box-shadow:0 7px 18px #050a3538}
+#adminPage #adminNav button .side-menu-icon{font-size:23px;min-width:24px;text-align:center}
+#adminPage .sidebar-bottom{margin-top:auto;border-top:1px solid #ffffff22;padding:22px 10px 0;display:flex;gap:9px;align-items:center;font-size:12px;color:#c7d2fe}
+#adminPage .sidebar-bottom i{font-size:19px}
+#adminPage .admin-area{min-width:0;flex:1;padding:30px clamp(16px,3vw,42px);max-width:1600px;margin:0 auto}
+#adminPage .admin-heading-title{display:flex;align-items:center;gap:12px}
+#adminPage .sidebar-toggle{display:none;border:1px solid #d3dbec;background:white;width:43px;height:43px;border-radius:12px;color:#3730a3;font-size:22px;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer}
+#adminPage .admin-sidebar-backdrop{display:none}
+#modalRoot .roster-select-tools{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:#eef2ff;border:1px solid #c7d2fe;padding:12px 14px;border-radius:13px;margin:10px 0}
+#modalRoot .roster-select-tools label{display:flex;align-items:center;gap:9px;color:#3730a3;font-weight:800;cursor:pointer}
+#modalRoot .roster-select-tools input{width:19px;height:19px;accent-color:#4f46e5;cursor:pointer}
+#modalRoot .roster-select-count{font-size:13px;font-weight:700;color:#475569}
+@media(max-width:900px){
+  #adminPage .admin-sidebar{position:fixed;top:0;left:0;height:100dvh;width:min(284px,85vw);z-index:52;transform:translateX(-105%);transition:transform .22s ease;overflow-y:auto;box-shadow:12px 0 45px #0f172a33}
+  #adminPage .admin-sidebar.is-open{transform:translateX(0)}
+  #adminPage .admin-sidebar-backdrop:not(.hidden){display:block;position:fixed;inset:0;z-index:51;background:#0f172a91}
+  #adminPage .sidebar-toggle{display:inline-flex}
+  #adminPage .admin-area{width:100%;padding:24px 16px}
 }
-#adminPage .admin-workspace {
-  display:flex;
-  align-items:stretch;
-  min-height:calc(100vh - 153px);
-}
-#adminPage .admin-sidebar {
-  width:255px;
-  flex:0 0 255px;
-  background:linear-gradient(165deg,#0f172a 0%,#1e2254 55%,#29256a 100%);
-  color:#e0e7ff;
-  box-shadow:5px 0 22px #1e293b16;
-  display:flex;
-  flex-direction:column;
-  padding:26px 14px 20px;
-}
-#adminPage .sidebar-logo {
-  display:flex;
-  align-items:center;
-  gap:12px;
-  color:#fff;
-  padding:2px 10px 28px;
-}
-#adminPage .sidebar-mark {
-  display:grid;
-  place-items:center;
-  width:43px;
-  height:43px;
-  border-radius:13px;
-  background:linear-gradient(135deg,#818cf8,#3b82f6);
-  font-size:26px;
-}
-#adminPage .sidebar-logo strong {
-  display:block;
-  font-size:17px;
-  letter-spacing:.05em;
-}
-#adminPage .sidebar-logo small {
-  display:block;
-  font-size:12px;
-  color:#c7d2fe;
-  margin-top:2px;
-}
-#adminPage .sidebar-section-label {
-  font-size:11px;
-  font-weight:800;
-  letter-spacing:.09em;
-  color:#a5b4fc;
-  padding:0 15px;
-  margin:0 0 10px;
-}
-#adminPage #adminNav.nav {
-  display:flex;
-  flex-direction:column;
-  gap:5px;
-  overflow:visible;
-  margin:0;
-  padding:0;
-}
-#adminPage #adminNav button {
-  width:100%;
-  min-height:46px;
-  display:flex;
-  align-items:center;
-  text-align:left;
-  gap:12px;
-  padding:12px 14px;
-  color:#dbe4ff;
-  border:1px solid transparent;
-  border-radius:12px;
-  background:transparent;
-  font-weight:700;
-  white-space:normal;
-  transition:background .18s ease,color .18s ease;
-}
-#adminPage #adminNav button:hover {
-  background:#ffffff18;
-  color:white;
-}
-#adminPage #adminNav button.selected {
-  background:linear-gradient(105deg,#4f46e5,#6366f1);
-  color:white;
-  border-color:#a5b4fc66;
-  box-shadow:0 7px 18px #050a3538;
-}
-#adminPage #adminNav button .side-menu-icon {
-  font-size:23px;
-  min-width:24px;
-  text-align:center;
-}
-#adminPage .sidebar-bottom {
-  margin-top:auto;
-  border-top:1px solid #ffffff22;
-  padding:22px 10px 0;
-  display:flex;
-  gap:9px;
-  align-items:center;
-  font-size:12px;
-  color:#c7d2fe;
-}
-#adminPage .sidebar-bottom i {
-  font-size:19px;
-}
-#adminPage .admin-area {
-  min-width:0;
-  flex:1;
-  padding:30px clamp(16px,3vw,42px);
-  max-width:1600px;
-  margin:0 auto;
-}
-#adminPage .admin-heading-title {
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-#adminPage .sidebar-toggle {
-  display:none;
-  border:1px solid #d3dbec;
-  background:white;
-  width:43px;
-  height:43px;
-  border-radius:12px;
-  color:#3730a3;
-  font-size:22px;
-  align-items:center;
-  justify-content:center;
-  flex-shrink:0;
-  cursor:pointer;
-}
-#adminPage .admin-sidebar-backdrop {
-  display:none;
+@media(max-width:640px){
+  #adminPage .admin-heading h2{font-size:21px}
+  #adminPage .admin-heading .button{font-size:12px;padding:9px 10px}
 }
 
-/* เลือกผู้เข้าร่วมทั้งหมด - คงเดิม */
-#modalRoot .roster-select-tools {
-  display:flex;
-  gap:10px;
-  align-items:center;
-  justify-content:space-between;
-  flex-wrap:wrap;
-  background:#eef2ff;
-  border:1px solid #c7d2fe;
-  padding:12px 14px;
-  border-radius:13px;
-  margin:10px 0;
-}
-#modalRoot .roster-select-tools label {
-  display:flex;
-  align-items:center;
-  gap:9px;
-  color:#3730a3;
-  font-weight:800;
-  cursor:pointer;
-}
-#modalRoot .roster-select-tools input {
-  width:19px;
-  height:19px;
-  accent-color:#4f46e5;
-  cursor:pointer;
-}
-#modalRoot .roster-select-count {
-  font-size:13px;
-  font-weight:700;
-  color:#475569;
-}
-@media(max-width:900px) {
-  #adminPage .admin-sidebar {
-    position:fixed;
-    top:0;
-    left:0;
-    height:100dvh;
-    width:min(284px,85vw);
-    z-index:52;
-    transform:translateX(-105%);
-    transition:transform .22s ease;
-    overflow-y:auto;
-    box-shadow:12px 0 45px #0f172a33;
-  }
-  #adminPage .admin-sidebar.is-open {
-    transform:translateX(0);
-  }
-  #adminPage .admin-sidebar-backdrop:not(.hidden) {
-    display:block;
-    position:fixed;
-    inset:0;
-    z-index:51;
-    background:#0f172a91;
-  }
-  #adminPage .sidebar-toggle {
-    display:inline-flex;
-  }
-  #adminPage .admin-area {
-    width:100%;
-    padding:24px 16px;
-  }
-}
-@media(max-width:640px) {
-  #adminPage .admin-heading h2 {
-    font-size:21px;
-  }
-  #adminPage .admin-heading .button {
-    font-size:12px;
-    padding:9px 10px;
-  }
-}
-
-/* เพิ่มใหม่: คำแนะนำรอบการประเมินตรงกลาง */
-#publicPage .evaluation-guide {
+/* คำแนะนำรอบการประเมิน: กึ่งกลางใต้ช่องเลือกปีและรอบ */
+#publicPage .evaluation-guide{
   box-sizing:border-box;
   width:100%;
   max-width:490px;
@@ -237,7 +58,7 @@
   color:#334155;
   text-align:center;
 }
-#publicPage .evaluation-guide-title {
+#publicPage .evaluation-guide-title{
   display:flex;
   align-items:center;
   justify-content:center;
@@ -246,205 +67,88 @@
   color:#3730a3;
   margin:0 0 8px;
 }
-#publicPage .evaluation-guide-line {
+#publicPage .evaluation-guide-line{
   margin:5px 0;
   font-size:14px;
   line-height:1.65;
 }
-#publicPage .evaluation-guide-line.active {
+#publicPage .evaluation-guide-line.active{
   font-weight:800;
   color:#312e81;
 }
-#publicPage .evaluation-guide-current {
+#publicPage .evaluation-guide-current{
   border-top:1px solid #c7d2fe;
   margin:10px 0 0;
   padding-top:9px;
   font-size:13px;
   color:#475569;
 }
-@media(max-width:480px) {
-  #publicPage .evaluation-guide {
-    padding:13px 10px;
-  }
-  #publicPage .evaluation-guide-line {
-    font-size:13px;
-  }
+@media(max-width:480px){
+  #publicPage .evaluation-guide{padding:13px 10px}
+  #publicPage .evaluation-guide-line{font-size:13px}
 }
 </style>
-</head>
-
-<body>
-
-<header class="header">
-  <div class="header-inside">
-    <div class="brand-icon">
-      <i class="ph ph-buildings"></i>
-    </div>
-    <div class="branding">
-      <h1>โรงเรียนบ้านแฮดศึกษา</h1>
-      <p>ระบบแจ้งผลพิจารณาเลื่อนเงินเดือน</p>
-    </div>
-    <button type="button" id="adminTop" class="admin-link">
-      <i class="ph ph-lock-key"></i>
-      <span id="adminTopLabel">แอดมิน</span>
-    </button>
-  </div>
-</header>
-
-<!-- หน้าแรกของครู -->
+</head><body>
+<header class="header"><div class="header-inside">
+<div class="brand-icon"><i class="ph ph-buildings"></i></div>
+<div class="branding"><h1>โรงเรียนบ้านแฮดศึกษา</h1><p>ระบบแจ้งผลพิจารณาเลื่อนเงินเดือน</p></div>
+<button type="button" id="adminTop" class="admin-link"><i class="ph ph-lock-key"></i> <span id="adminTopLabel">แอดมิน</span></button>
+</div></header>
 <main id="publicPage" class="public-main">
-  <section class="search-card">
-    <div class="round-blur blur1"></div>
-    <div class="round-blur blur2"></div>
-
-    <div class="search-intro">
-      <div class="fingerprint">
-        <i class="ph ph-fingerprint"></i>
-      </div>
-      <h2>ตรวจสอบข้อมูลส่วนบุคคล</h2>
-      <p>กรุณากรอกเลขประจำตัวประชาชน 13 หลัก</p>
-    </div>
-
-    <form id="searchForm" class="search-form">
-      <div class="id-wrap">
-        <i class="ph ph-identification-card"></i>
-        <input
-          type="text"
-          id="nationalId"
-          maxlength="13"
-          inputmode="numeric"
-          autocomplete="off"
-          placeholder="กรอกรหัส 13 หลักที่นี่"
-          required>
-      </div>
-
-      <div class="two">
-        <label>
-          ปี พ.ศ.
-          <select id="publicYear" class="field" required></select>
-        </label>
-        <label>
-          รอบการประเมิน
-          <select id="publicRound" class="field" required></select>
-        </label>
-      </div>
-
-      <!-- เพิ่มใหม่: คำแนะนำอยู่ตรงกลาง -->
-      <div class="evaluation-guide" aria-live="polite">
-        <div class="evaluation-guide-title">
-          <i class="ph ph-info" aria-hidden="true"></i>
-          คำแนะนำการเลือกรอบการประเมิน
-        </div>
-
-        <p class="evaluation-guide-line" id="evaluationGuideRound1">
-          รอบที่ 1 : 1 ตุลาคม – 31 มีนาคม
-        </p>
-
-        <p class="evaluation-guide-line" id="evaluationGuideRound2">
-          รอบที่ 2 : 1 เมษายน – 30 กันยายน
-        </p>
-
-        <p class="evaluation-guide-current" id="evaluationGuideCurrent">
-          กรุณาเลือกปีและรอบการประเมิน
-        </p>
-      </div>
-
-      <button type="submit" class="button primary wide">
-        <i class="ph ph-magnifying-glass"></i>
-        ค้นหาข้อมูลเลื่อนเงินเดือน
-      </button>
-    </form>
-  </section>
-
-  <div id="resultArea" class="result-area" aria-live="polite"></div>
-</main>
-
-<!-- หน้าแอดมินเดิม -->
+<section class="search-card"><div class="round-blur blur1"></div><div class="round-blur blur2"></div>
+<div class="search-intro">
+<h2>ตรวจสอบข้อมูลส่วนบุคคล</h2><p>กรุณากรอกเลขประจำตัวประชาชน 13 หลัก</p></div>
+<form id="searchForm" class="search-form"><div class="id-wrap"><i class="ph ph-identification-card"></i>
+<input type="text" id="nationalId" maxlength="13" inputmode="numeric" autocomplete="off" placeholder="กรอกรหัส 13 หลักที่นี่" required></div>
+<div class="two"><label>ปี พ.ศ.<select id="publicYear" class="field" required></select></label><label>รอบการประเมิน<select id="publicRound" class="field" required></select></label></div>
+<div class="evaluation-guide" aria-live="polite">
+  <div class="evaluation-guide-title"><i class="ph ph-info" aria-hidden="true"></i> คำแนะนำการเลือกรอบการประเมิน</div>
+  <p class="evaluation-guide-line" id="evaluationGuideRound1">รอบที่ 1 : 1 ตุลาคม – 31 มีนาคม</p>
+  <p class="evaluation-guide-line" id="evaluationGuideRound2">รอบที่ 2 : 1 เมษายน – 30 กันยายน</p>
+  <p class="evaluation-guide-current" id="evaluationGuideCurrent">กรุณาเลือกปีและรอบการประเมิน</p>
+</div>
+<button type="submit" class="button primary wide"><i class="ph ph-magnifying-glass"></i> ค้นหาข้อมูลเลื่อนเงินเดือน</button></form></section>
+<div id="resultArea" class="result-area" aria-live="polite"></div></main>
 <main id="adminPage" class="admin-main hidden">
-  <div id="sidebarBackdrop"
-       class="admin-sidebar-backdrop hidden"
-       aria-hidden="true"></div>
-
+  <div id="sidebarBackdrop" class="admin-sidebar-backdrop hidden" aria-hidden="true"></div>
   <div class="admin-workspace">
-    <aside id="adminSidebar"
-           class="admin-sidebar"
-           aria-label="เมนูจัดการระบบ">
-
+    <aside id="adminSidebar" class="admin-sidebar" aria-label="เมนูจัดการระบบ">
       <div class="sidebar-logo">
-        <span class="sidebar-mark">
-          <i class="ph ph-buildings"></i>
-        </span>
-        <div>
-          <strong>BHS SALARY</strong>
-          <small>ระบบบริหารจัดการ</small>
-        </div>
+        <span class="sidebar-mark"><i class="ph ph-buildings"></i></span>
+        <div><strong>BHS SALARY</strong><small>ระบบบริหารจัดการ</small></div>
       </div>
-
       <p class="sidebar-section-label">เมนูหลัก</p>
-
-      <nav id="adminNav"
-           class="nav"
-           aria-label="เมนูด้านซ้าย"></nav>
-
-      <div class="sidebar-bottom">
-        <i class="ph ph-shield-check"></i>
-        สำหรับผู้ดูแลระบบ
-      </div>
+      <nav id="adminNav" class="nav" aria-label="เมนูด้านซ้าย"></nav>
+      <div class="sidebar-bottom"><i class="ph ph-shield-check"></i> สำหรับผู้ดูแลระบบ</div>
     </aside>
-
     <section class="admin-area">
       <div class="admin-heading">
         <div class="admin-heading-title">
-          <button
-            class="sidebar-toggle"
-            type="button"
-            id="sidebarToggle"
-            aria-label="เปิดหรือปิดเมนู"
-            aria-expanded="false">
-            <i class="ph ph-list"></i>
-          </button>
-
-          <div>
-            <h2>หน้าบริหารจัดการ</h2>
-            <p>ระบบข้อมูลครูและเอกสาร PDF</p>
-          </div>
+          <button class="sidebar-toggle" type="button" id="sidebarToggle" aria-label="เปิดหรือปิดเมนู" aria-expanded="false"><i class="ph ph-list"></i></button>
+          <div><h2>หน้าบริหารจัดการ</h2><p>ระบบข้อมูลครูและเอกสาร PDF</p></div>
         </div>
-
-        <button class="button light" id="logoutBtn">
-          <i class="ph ph-sign-out"></i>
-          ออกจากระบบ
-        </button>
+        <button class="button light" id="logoutBtn"><i class="ph ph-sign-out"></i> ออกจากระบบ</button>
       </div>
-
       <div id="adminContent"></div>
     </section>
   </div>
 </main>
-
 <footer>© 2026 โรงเรียนบ้านแฮดศึกษา</footer>
-
-<div id="modalRoot"></div>
-<div id="toast" class="toast hidden" role="status"></div>
-
-<!-- ใช้ Firebase และ Drive ผ่าน main.js เดิม -->
+<div id="modalRoot"></div><div id="toast" class="toast hidden" role="status"></div>
 <script type="module" src="/src/main.js"></script>
 
 <script>
+/* ส่วนเสริมเล็ก ๆ ของ index.html: ไม่แก้การทำงานเดิมใน src/main.js */
 (() => {
   const sidebar = document.getElementById('adminSidebar');
   const backdrop = document.getElementById('sidebarBackdrop');
   const toggle = document.getElementById('sidebarToggle');
   const nav = document.getElementById('adminNav');
   const modalRoot = document.getElementById('modalRoot');
-
   const icons = {
-    dashboard: 'squares-four',
-    teachers: 'users-three',
-    periods: 'calendar-check',
-    docs: 'file-pdf',
-    trash: 'trash',
-    logs: 'clock-counter-clockwise',
-    settings: 'gear-six'
+    dashboard: 'squares-four', teachers: 'users-three',
+    periods: 'calendar-check', docs: 'file-pdf', trash: 'trash',
+    logs: 'clock-counter-clockwise', settings: 'gear-six'
   };
 
   function setSidebar(open) {
@@ -452,112 +156,66 @@
     backdrop.classList.toggle('hidden', !open);
     toggle.setAttribute('aria-expanded', String(open));
   }
-
-  toggle.addEventListener('click', () => {
-    setSidebar(!sidebar.classList.contains('is-open'));
-  });
-
+  toggle.addEventListener('click', () => setSidebar(!sidebar.classList.contains('is-open')));
   backdrop.addEventListener('click', () => setSidebar(false));
-
   nav.addEventListener('click', event => {
-    if (event.target.closest('button[data-tab]')) {
-      setSidebar(false);
-    }
+    if (event.target.closest('button[data-tab]')) setSidebar(false);
   });
-
-  document.getElementById('logoutBtn')
-    .addEventListener('click', () => setSidebar(false));
-
+  document.getElementById('logoutBtn').addEventListener('click', () => setSidebar(false));
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape') setSidebar(false);
   });
 
-  // ตกแต่งเมนูแอดมินเดิม
+  // เมนูถูกวาดใหม่ทุกครั้งที่เปลี่ยนหน้า จึงเติมไอคอนเมื่อมีปุ่มใหม่
   function decorateMenu() {
     nav.querySelectorAll('button[data-tab]').forEach(button => {
       if (button.querySelector('i')) return;
-
       const icon = document.createElement('i');
-      icon.className =
-        'ph ph-' +
-        (icons[button.dataset.tab] || 'squares-four') +
-        ' side-menu-icon';
-
+      icon.className = 'ph ph-' + (icons[button.dataset.tab] || 'squares-four') + ' side-menu-icon';
       icon.setAttribute('aria-hidden', 'true');
       button.prepend(icon);
     });
   }
+  new MutationObserver(decorateMenu).observe(nav, { childList: true });
 
-  new MutationObserver(decorateMenu)
-    .observe(nav, { childList: true });
-
-  // เลือกผู้เข้าร่วมทั้งหมด - คงการทำงานเดิม
+  // เพิ่มเลือกทั้งหมดในกล่อง "ผู้เข้าร่วม" โดยยังใช้การบันทึกเดิมของ src/main.js
   function addSelectAll() {
-    const checkboxes = [
-      ...modalRoot.querySelectorAll('input[data-roster-person]')
-    ];
-
-    if (!checkboxes.length ||
-        modalRoot.querySelector('#rosterSelectAll')) return;
-
+    const checkboxes = [...modalRoot.querySelectorAll('input[data-roster-person]')];
+    if (!checkboxes.length || modalRoot.querySelector('#rosterSelectAll')) return;
     const list = checkboxes[0].closest('.table-scroll');
     if (!list) return;
 
     const tools = document.createElement('div');
     tools.className = 'roster-select-tools';
-
-    tools.innerHTML = `
-      <label>
-        <input type="checkbox" id="rosterSelectAll">
-        เลือกทั้งหมด / ยกเลิกทั้งหมด
-      </label>
-      <span class="roster-select-count"
-            id="rosterSelectCount"></span>
-    `;
-
+    tools.innerHTML = '<label><input type="checkbox" id="rosterSelectAll"> เลือกทั้งหมด / ยกเลิกทั้งหมด</label><span class="roster-select-count" id="rosterSelectCount"></span>';
     list.parentNode.insertBefore(tools, list);
 
     const all = tools.querySelector('#rosterSelectAll');
     const count = tools.querySelector('#rosterSelectCount');
-
     function update() {
       const n = checkboxes.filter(box => box.checked).length;
-
       all.checked = n === checkboxes.length;
       all.indeterminate = n > 0 && n < checkboxes.length;
-      count.textContent =
-        'เลือกแล้ว ' + n + ' / ' + checkboxes.length + ' คน';
+      count.textContent = 'เลือกแล้ว ' + n + ' / ' + checkboxes.length + ' คน';
     }
-
+    // dispatchEvent สำคัญ เพราะโค้ดเดิมติดตามรายการที่เลือกผ่าน onchange
     all.addEventListener('change', () => {
       const checked = all.checked;
-
       checkboxes.forEach(box => {
         if (box.checked !== checked) {
           box.checked = checked;
-          box.dispatchEvent(
-            new Event('change', { bubbles: true })
-          );
+          box.dispatchEvent(new Event('change', { bubbles: true }));
         }
       });
-
       update();
     });
-
-    checkboxes.forEach(box => {
-      box.addEventListener('change', update);
-    });
-
+    checkboxes.forEach(box => box.addEventListener('change', update));
     update();
   }
+  new MutationObserver(addSelectAll).observe(modalRoot, { childList: true, subtree: true });
 
-  new MutationObserver(addSelectAll)
-    .observe(modalRoot, {
-      childList: true,
-      subtree: true
-    });
-
-  // เพิ่มใหม่: เปลี่ยนคำแนะนำตามปีและรอบที่ครูเลือก
+  // ปรับเฉพาะข้อความคำแนะนำหน้าแรกตามปี/รอบที่ครูเลือก
+  // รอบที่ 1 เริ่ม 1 ตุลาคมของปีก่อนและสิ้นสุด 31 มีนาคมของปีที่เลือก
   const yearSelect = document.getElementById('publicYear');
   const roundSelect = document.getElementById('publicRound');
   const line1 = document.getElementById('evaluationGuideRound1');
@@ -567,49 +225,28 @@
   function updateEvaluationGuide() {
     const year = Number(yearSelect.value);
     const round = Number(roundSelect.value);
-    const validYear =
-      Number.isInteger(year) && year >= 2400 && year <= 3000;
+    const validYear = Number.isInteger(year) && year >= 2400 && year <= 3000;
 
     line1.textContent = validYear
       ? `รอบที่ 1 : 1 ตุลาคม ${year - 1} – 31 มีนาคม ${year}`
       : 'รอบที่ 1 : 1 ตุลาคม – 31 มีนาคม';
-
     line2.textContent = validYear
       ? `รอบที่ 2 : 1 เมษายน ${year} – 30 กันยายน ${year}`
       : 'รอบที่ 2 : 1 เมษายน – 30 กันยายน';
 
-    line1.classList.toggle(
-      'active', validYear && round === 1
-    );
-
-    line2.classList.toggle(
-      'active', validYear && round === 2
-    );
-
-    current.textContent =
-      validYear && (round === 1 || round === 2)
-        ? `คุณกำลังเลือกผลการเลื่อนเงินเดือนครั้งที่ ${round} (${round === 1 ? '1 เมษายน' : '1 ตุลาคม'}) พ.ศ. ${year}`
-        : 'กรุณาเลือกปีและรอบการประเมิน';
+    line1.classList.toggle('active', validYear && round === 1);
+    line2.classList.toggle('active', validYear && round === 2);
+    current.textContent = validYear && (round === 1 || round === 2)
+      ? `คุณกำลังเลือกผลการเลื่อนเงินเดือนครั้งที่ ${round} (${round === 1 ? '1 เมษายน' : '1 ตุลาคม'}) พ.ศ. ${year}`
+      : 'กรุณาเลือกปีและรอบการประเมิน';
   }
 
-  yearSelect.addEventListener(
-    'change', updateEvaluationGuide
-  );
-
-  roundSelect.addEventListener(
-    'change', updateEvaluationGuide
-  );
-
-  // อัปเดตเมื่อ main.js โหลดปีและรอบที่เผยแพร่
-  new MutationObserver(updateEvaluationGuide)
-    .observe(yearSelect, { childList: true });
-
-  new MutationObserver(updateEvaluationGuide)
-    .observe(roundSelect, { childList: true });
-
+  yearSelect.addEventListener('change', updateEvaluationGuide);
+  roundSelect.addEventListener('change', updateEvaluationGuide);
+  // main.js โหลดปีและรอบที่เผยแพร่แบบ asynchronous; อัปเดตข้อความเมื่อรายการเปลี่ยน
+  new MutationObserver(updateEvaluationGuide).observe(yearSelect, {childList:true});
+  new MutationObserver(updateEvaluationGuide).observe(roundSelect, {childList:true});
   updateEvaluationGuide();
 })();
 </script>
-
-</body>
-</html>
+</body></html>
