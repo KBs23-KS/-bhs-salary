@@ -1,252 +1,264 @@
 
-<!doctype html>
-<html lang="th"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="referrer" content="no-referrer">
-<title>ระบบแจ้งผลพิจารณาเลื่อนเงินเดือน โรงเรียนบ้านแฮดศึกษา</title>
-<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.2/src/regular/style.css">
-<link rel="stylesheet" href="./src/style.css">
+name: BHS - Enable PDF PIN viewer
 
-<style>
-/* เพิ่มรูปแบบเฉพาะหน้าแอดมินเท่านั้น */
-#adminPage.admin-main{max-width:none;width:100%;margin:0;padding:0}
-#adminPage .admin-workspace{display:flex;align-items:stretch;min-height:calc(100vh - 153px)}
-#adminPage .admin-sidebar{width:255px;flex:0 0 255px;background:linear-gradient(165deg,#0f172a 0%,#1e2254 55%,#29256a 100%);color:#e0e7ff;box-shadow:5px 0 22px #1e293b16;display:flex;flex-direction:column;padding:26px 14px 20px}
-#adminPage .sidebar-logo{display:flex;align-items:center;gap:12px;color:#fff;padding:2px 10px 28px}
-#adminPage .sidebar-mark{display:grid;place-items:center;width:43px;height:43px;border-radius:13px;background:linear-gradient(135deg,#818cf8,#3b82f6);font-size:26px}
-#adminPage .sidebar-logo strong{display:block;font-size:17px;letter-spacing:.05em}
-#adminPage .sidebar-logo small{display:block;font-size:12px;color:#c7d2fe;margin-top:2px}
-#adminPage .sidebar-section-label{font-size:11px;font-weight:800;letter-spacing:.09em;color:#a5b4fc;padding:0 15px;margin:0 0 10px}
-#adminPage #adminNav.nav{display:flex;flex-direction:column;gap:5px;overflow:visible;margin:0;padding:0}
-#adminPage #adminNav button{width:100%;min-height:46px;display:flex;align-items:center;text-align:left;gap:12px;padding:12px 14px;color:#dbe4ff;border:1px solid transparent;border-radius:12px;background:transparent;font-weight:700;white-space:normal;transition:background .18s ease,color .18s ease}
-#adminPage #adminNav button:hover{background:#ffffff18;color:white}
-#adminPage #adminNav button.selected{background:linear-gradient(105deg,#4f46e5,#6366f1);color:white;border-color:#a5b4fc66;box-shadow:0 7px 18px #050a3538}
-#adminPage #adminNav button .side-menu-icon{font-size:23px;min-width:24px;text-align:center}
-#adminPage .sidebar-bottom{margin-top:auto;border-top:1px solid #ffffff22;padding:22px 10px 0;display:flex;gap:9px;align-items:center;font-size:12px;color:#c7d2fe}
-#adminPage .sidebar-bottom i{font-size:19px}
-#adminPage .admin-area{min-width:0;flex:1;padding:30px clamp(16px,3vw,42px);max-width:1600px;margin:0 auto}
-#adminPage .admin-heading-title{display:flex;align-items:center;gap:12px}
-#adminPage .sidebar-toggle{display:none;border:1px solid #d3dbec;background:white;width:43px;height:43px;border-radius:12px;color:#3730a3;font-size:22px;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer}
-#adminPage .admin-sidebar-backdrop{display:none}
-#modalRoot .roster-select-tools{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:#eef2ff;border:1px solid #c7d2fe;padding:12px 14px;border-radius:13px;margin:10px 0}
-#modalRoot .roster-select-tools label{display:flex;align-items:center;gap:9px;color:#3730a3;font-weight:800;cursor:pointer}
-#modalRoot .roster-select-tools input{width:19px;height:19px;accent-color:#4f46e5;cursor:pointer}
-#modalRoot .roster-select-count{font-size:13px;font-weight:700;color:#475569}
-@media(max-width:900px){
-  #adminPage .admin-sidebar{position:fixed;top:0;left:0;height:100dvh;width:min(284px,85vw);z-index:52;transform:translateX(-105%);transition:transform .22s ease;overflow-y:auto;box-shadow:12px 0 45px #0f172a33}
-  #adminPage .admin-sidebar.is-open{transform:translateX(0)}
-  #adminPage .admin-sidebar-backdrop:not(.hidden){display:block;position:fixed;inset:0;z-index:51;background:#0f172a91}
-  #adminPage .sidebar-toggle{display:inline-flex}
-  #adminPage .admin-area{width:100%;padding:24px 16px}
-}
-@media(max-width:640px){
-  #adminPage .admin-heading h2{font-size:21px}
-  #adminPage .admin-heading .button{font-size:12px;padding:9px 10px}
-}
+on:
+  push:
+    paths:
+      - .github/workflows/bhs-pin-view-update.yml
+  workflow_dispatch:
 
-/* คำแนะนำรอบการประเมิน: กึ่งกลางใต้ช่องเลือกปีและรอบ */
-#publicPage .evaluation-guide{
-  box-sizing:border-box;
-  width:100%;
-  max-width:490px;
-  margin:2px auto 6px;
-  padding:15px 16px;
-  border:1px solid #c7d2fe;
-  border-radius:16px;
-  background:#eef2ff;
-  color:#334155;
-  text-align:center;
-}
-#publicPage .evaluation-guide-title{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:7px;
-  font-weight:800;
-  color:#3730a3;
-  margin:0 0 8px;
-}
-#publicPage .evaluation-guide-line{
-  margin:5px 0;
-  font-size:14px;
-  line-height:1.65;
-}
-#publicPage .evaluation-guide-line.active{
-  font-weight:800;
-  color:#312e81;
-}
-#publicPage .evaluation-guide-current{
-  border-top:1px solid #c7d2fe;
-  margin:10px 0 0;
-  padding-top:9px;
-  font-size:13px;
-  color:#475569;
-}
-@media(max-width:480px){
-  #publicPage .evaluation-guide{padding:13px 10px}
-  #publicPage .evaluation-guide-line{font-size:13px}
-}
-</style>
-</head><body>
-<header class="header"><div class="header-inside">
-<div class="brand-icon"><i class="ph ph-buildings"></i></div>
-<div class="branding"><h1>โรงเรียนบ้านแฮดศึกษา</h1><p>ระบบแจ้งผลพิจารณาเลื่อนเงินเดือน</p></div>
-<button type="button" id="adminTop" class="admin-link"><i class="ph ph-lock-key"></i> <span id="adminTopLabel">แอดมิน</span></button>
-</div></header>
-<main id="publicPage" class="public-main">
-<section class="search-card"><div class="round-blur blur1"></div><div class="round-blur blur2"></div>
-<div class="search-intro">
-<h2>ตรวจสอบข้อมูลส่วนบุคคล</h2><p>กรุณากรอกเลขประจำตัวประชาชน 13 หลัก</p></div>
-<form id="searchForm" class="search-form"><div class="id-wrap"><i class="ph ph-identification-card"></i>
-<input type="text" id="nationalId" maxlength="13" inputmode="numeric" autocomplete="off" placeholder="กรอกรหัส 13 หลักที่นี่" required></div>
-<div class="two"><label>ปี พ.ศ.<select id="publicYear" class="field" required></select></label><label>รอบการประเมิน<select id="publicRound" class="field" required></select></label></div>
-<div class="evaluation-guide" aria-live="polite">
-  <div class="evaluation-guide-title"><i class="ph ph-info" aria-hidden="true"></i> คำแนะนำการเลือกรอบการประเมิน</div>
-  <p class="evaluation-guide-line" id="evaluationGuideRound1">รอบที่ 1 : 1 ตุลาคม – 31 มีนาคม</p>
-  <p class="evaluation-guide-line" id="evaluationGuideRound2">รอบที่ 2 : 1 เมษายน – 30 กันยายน</p>
-  <p class="evaluation-guide-current" id="evaluationGuideCurrent">กรุณาเลือกปีและรอบการประเมิน</p>
-</div>
-<button type="submit" class="button primary wide"><i class="ph ph-magnifying-glass"></i> ค้นหาข้อมูลเลื่อนเงินเดือน</button></form></section>
-<div id="resultArea" class="result-area" aria-live="polite"></div></main>
-<main id="adminPage" class="admin-main hidden">
-  <div id="sidebarBackdrop" class="admin-sidebar-backdrop hidden" aria-hidden="true"></div>
-  <div class="admin-workspace">
-    <aside id="adminSidebar" class="admin-sidebar" aria-label="เมนูจัดการระบบ">
-      <div class="sidebar-logo">
-        <span class="sidebar-mark"><i class="ph ph-buildings"></i></span>
-        <div><strong>BHS SALARY</strong><small>ระบบบริหารจัดการ</small></div>
-      </div>
-      <p class="sidebar-section-label">เมนูหลัก</p>
-      <nav id="adminNav" class="nav" aria-label="เมนูด้านซ้าย"></nav>
-      <div class="sidebar-bottom"><i class="ph ph-shield-check"></i> สำหรับผู้ดูแลระบบ</div>
-    </aside>
-    <section class="admin-area">
-      <div class="admin-heading">
-        <div class="admin-heading-title">
-          <button class="sidebar-toggle" type="button" id="sidebarToggle" aria-label="เปิดหรือปิดเมนู" aria-expanded="false"><i class="ph ph-list"></i></button>
-          <div><h2>หน้าบริหารจัดการ</h2><p>ระบบข้อมูลครูและเอกสาร PDF</p></div>
-        </div>
-        <button class="button light" id="logoutBtn"><i class="ph ph-sign-out"></i> ออกจากระบบ</button>
-      </div>
-      <div id="adminContent"></div>
-    </section>
-  </div>
-</main>
-<footer>© 2026 โรงเรียนบ้านแฮดศึกษา</footer>
-<div id="modalRoot"></div><div id="toast" class="toast hidden" role="status"></div>
-<script type="module" src="/src/main.js"></script>
+permissions:
+  contents: write
 
-<script>
-/* ส่วนเสริมเล็ก ๆ ของ index.html: ไม่แก้การทำงานเดิมใน src/main.js */
-(() => {
-  const sidebar = document.getElementById('adminSidebar');
-  const backdrop = document.getElementById('sidebarBackdrop');
-  const toggle = document.getElementById('sidebarToggle');
-  const nav = document.getElementById('adminNav');
-  const modalRoot = document.getElementById('modalRoot');
-  const icons = {
-    dashboard: 'squares-four', teachers: 'users-three',
-    periods: 'calendar-check', docs: 'file-pdf', trash: 'trash',
-    logs: 'clock-counter-clockwise', settings: 'gear-six'
-  };
+jobs:
+  update-pdf-pin-view:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout school website
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-  function setSidebar(open) {
-    sidebar.classList.toggle('is-open', open);
-    backdrop.classList.toggle('hidden', !open);
-    toggle.setAttribute('aria-expanded', String(open));
-  }
-  toggle.addEventListener('click', () => setSidebar(!sidebar.classList.contains('is-open')));
-  backdrop.addEventListener('click', () => setSidebar(false));
-  nav.addEventListener('click', event => {
-    if (event.target.closest('button[data-tab]')) setSidebar(false);
-  });
-  document.getElementById('logoutBtn').addEventListener('click', () => setSidebar(false));
-  document.addEventListener('keydown', event => {
-    if (event.key === 'Escape') setSidebar(false);
-  });
+      - name: Apply PDF PIN viewer update
+        shell: bash
+        run: |
+          python3 - <<'PYCODE'
+          from pathlib import Path
 
-  // เมนูถูกวาดใหม่ทุกครั้งที่เปลี่ยนหน้า จึงเติมไอคอนเมื่อมีปุ่มใหม่
-  function decorateMenu() {
-    nav.querySelectorAll('button[data-tab]').forEach(button => {
-      if (button.querySelector('i')) return;
-      const icon = document.createElement('i');
-      icon.className = 'ph ph-' + (icons[button.dataset.tab] || 'squares-four') + ' side-menu-icon';
-      icon.setAttribute('aria-hidden', 'true');
-      button.prepend(icon);
-    });
-  }
-  new MutationObserver(decorateMenu).observe(nav, { childList: true });
+          def replace_once(path, before, after):
+              data=path.read_text(encoding='utf-8')
+              if after in data:
+                  print(f'Already updated: {path}')
+                  return
+              found=data.count(before)
+              if found!=1:
+                  raise RuntimeError(
+                      f'Expected one source match, got {found}: {path}: {before[:125]!r}'
+                  )
+              path.write_text(data.replace(before,after),encoding='utf-8')
 
-  // เพิ่มเลือกทั้งหมดในกล่อง "ผู้เข้าร่วม" โดยยังใช้การบันทึกเดิมของ src/main.js
-  function addSelectAll() {
-    const checkboxes = [...modalRoot.querySelectorAll('input[data-roster-person]')];
-    if (!checkboxes.length || modalRoot.querySelector('#rosterSelectAll')) return;
-    const list = checkboxes[0].closest('.table-scroll');
-    if (!list) return;
+          lib=Path('api/_lib.js')
+          admin=Path('api/admin.js')
+          main=Path('src/main.js')
 
-    const tools = document.createElement('div');
-    tools.className = 'roster-select-tools';
-    tools.innerHTML = '<label><input type="checkbox" id="rosterSelectAll"> เลือกทั้งหมด / ยกเลิกทั้งหมด</label><span class="roster-select-count" id="rosterSelectCount"></span>';
-    list.parentNode.insertBefore(tools, list);
+          for f in (lib,admin,main):
+              if not f.is_file():
+                  raise RuntimeError(f'Missing source file: {f}')
 
-    const all = tools.querySelector('#rosterSelectAll');
-    const count = tools.querySelector('#rosterSelectCount');
-    function update() {
-      const n = checkboxes.filter(box => box.checked).length;
-      all.checked = n === checkboxes.length;
-      all.indeterminate = n > 0 && n < checkboxes.length;
-      count.textContent = 'เลือกแล้ว ' + n + ' / ' + checkboxes.length + ' คน';
-    }
-    // dispatchEvent สำคัญ เพราะโค้ดเดิมติดตามรายการที่เลือกผ่าน onchange
-    all.addEventListener('change', () => {
-      const checked = all.checked;
-      checkboxes.forEach(box => {
-        if (box.checked !== checked) {
-          box.checked = checked;
-          box.dispatchEvent(new Event('change', { bubbles: true }));
-        }
-      });
-      update();
-    });
-    checkboxes.forEach(box => box.addEventListener('change', update));
-    update();
-  }
-  new MutationObserver(addSelectAll).observe(modalRoot, { childList: true, subtree: true });
+          # Secure encryption utilities, using a derived server-only key.
+          replace_once(
+              lib,
+              "import { randomBytes, createHash, createHmac, scryptSync, timingSafeEqual, createCipheriv, createDecipheriv } from 'node:crypto';",
+              "import { randomBytes, createHash, createHmac, hkdfSync, scryptSync, timingSafeEqual, createCipheriv, createDecipheriv } from 'node:crypto';"
+          )
 
-  // ปรับเฉพาะข้อความคำแนะนำหน้าแรกตามปี/รอบที่ครูเลือก
-  // รอบที่ 1 เริ่ม 1 ตุลาคมของปีก่อนและสิ้นสุด 31 มีนาคมของปีที่เลือก
-  const yearSelect = document.getElementById('publicYear');
-  const roundSelect = document.getElementById('publicRound');
-  const line1 = document.getElementById('evaluationGuideRound1');
-  const line2 = document.getElementById('evaluationGuideRound2');
-  const current = document.getElementById('evaluationGuideCurrent');
+          replace_once(
+              lib,
+              "export function oauth() {",
+              """// A separate AES-GCM key derived from the existing server key.
+          // Keep DRIVE_TOKEN_KEY_BASE64 unchanged to preserve encrypted PINs.
+          function pdfPinKey() {
+            return Buffer.from(hkdfSync('sha256', key32(),
+              Buffer.from('BHS-Salary/pin-storage/v1/salt'),
+              Buffer.from('BHS-Salary/PDF-PIN-AES256-GCM/v1'), 32));
+          }
 
-  function updateEvaluationGuide() {
-    const year = Number(yearSelect.value);
-    const round = Number(roundSelect.value);
-    const validYear = Number.isInteger(year) && year >= 2400 && year <= 3000;
+          export function encryptPdfPin(pin, teacherId) {
+            const iv=randomBytes(12);
+            const cipher=createCipheriv('aes-256-gcm',pdfPinKey(),iv);
+            cipher.setAAD(Buffer.from(String(teacherId),'utf8'));
+            const payload=Buffer.concat([
+              cipher.update(pin,'utf8'),cipher.final()
+            ]);
+            return `v1.${iv.toString('base64url')}.${cipher.getAuthTag().toString('base64url')}.${payload.toString('base64url')}`;
+          }
 
-    line1.textContent = validYear
-      ? `รอบที่ 1 : 1 ตุลาคม ${year - 1} – 31 มีนาคม ${year}`
-      : 'รอบที่ 1 : 1 ตุลาคม – 31 มีนาคม';
-    line2.textContent = validYear
-      ? `รอบที่ 2 : 1 เมษายน ${year} – 30 กันยายน ${year}`
-      : 'รอบที่ 2 : 1 เมษายน – 30 กันยายน';
+          export function decryptPdfPin(value, teacherId) {
+            const parts=String(value||'').split('.');
+            if(parts.length!==4||parts[0]!=='v1')
+              throw error('ไม่พบรหัส PDF ที่เปิดดูย้อนหลังได้',409);
 
-    line1.classList.toggle('active', validYear && round === 1);
-    line2.classList.toggle('active', validYear && round === 2);
-    current.textContent = validYear && (round === 1 || round === 2)
-      ? `คุณกำลังเลือกผลการเลื่อนเงินเดือนครั้งที่ ${round} (${round === 1 ? '1 เมษายน' : '1 ตุลาคม'}) พ.ศ. ${year}`
-      : 'กรุณาเลือกปีและรอบการประเมิน';
-  }
+            try {
+              const iv=Buffer.from(parts[1],'base64url');
+              const tag=Buffer.from(parts[2],'base64url');
+              if(iv.length!==12||tag.length!==16)
+                throw Error('Invalid encrypted PIN');
 
-  yearSelect.addEventListener('change', updateEvaluationGuide);
-  roundSelect.addEventListener('change', updateEvaluationGuide);
-  // main.js โหลดปีและรอบที่เผยแพร่แบบ asynchronous; อัปเดตข้อความเมื่อรายการเปลี่ยน
-  new MutationObserver(updateEvaluationGuide).observe(yearSelect, {childList:true});
-  new MutationObserver(updateEvaluationGuide).observe(roundSelect, {childList:true});
-  updateEvaluationGuide();
-})();
-</script>
-</body></html>
+              const decipher=createDecipheriv(
+                'aes-256-gcm',pdfPinKey(),iv
+              );
+              decipher.setAAD(Buffer.from(String(teacherId),'utf8'));
+              decipher.setAuthTag(tag);
+
+              return Buffer.concat([
+                decipher.update(Buffer.from(parts[3],'base64url')),
+                decipher.final()
+              ]).toString('utf8');
+            } catch {
+              throw error('ไม่สามารถถอดรหัส PDF ได้ กรุณาตรวจสอบกุญแจเข้ารหัสบน Vercel',409);
+            }
+          }
+
+          export function oauth() {"""
+          )
+
+          # Keep PIN ciphertext out of ordinary metadata backups.
+          replace_once(
+              lib,
+              "collections.teachers=collections.teachers.map(({pin,...t})=>t);",
+              "collections.teachers=collections.teachers.map(({pin,pinEnc,...t})=>t);"
+          )
+
+          replace_once(
+              lib,
+              "// Never export live PIN hashes or admin Google OAuth secrets into general-purpose backups.",
+              "// Never export PDF PIN hashes, reversible ciphertext, or admin Google OAuth secrets into general-purpose backups."
+          )
+
+          # Backend: store hashes and encrypted copies together.
+          replace_once(
+              admin,
+              "hashPin,newPin,safeText,googleDrive",
+              "hashPin,newPin,encryptPdfPin,decryptPdfPin,safeText,googleDrive"
+          )
+
+          replace_once(
+              admin,
+              "teachers:entries(teachers).map(({pin,...t})=>({...t,pinSet:!!pin}))",
+              "teachers:entries(teachers).map(({pin,pinEnc,...t})=>({...t,pinSet:!!pin,pinViewable:!!pinEnc}))"
+          )
+
+          replace_once(
+              admin,
+              "if(b.pin){pin=String(b.pin);update.pin=hashPin(pin);}\n else if(!old?.pin){pin=newPin();update.pin=hashPin(pin);}",
+              "if(b.pin){pin=String(b.pin);update.pin=hashPin(pin);update.pinEnc=encryptPdfPin(pin,key);}\n else if(!old?.pin){pin=newPin();update.pin=hashPin(pin);update.pinEnc=encryptPdfPin(pin,key);}"
+          )
+
+          replace_once(
+              admin,
+              "if(!old) {pin=newPin();update.pin=hashPin(pin);update.status='active';",
+              "if(!old) {pin=newPin();update.pin=hashPin(pin);update.pinEnc=encryptPdfPin(pin,key);update.status='active';"
+          )
+
+          replace_once(
+              admin,
+              "const pin=b.pin?String(b.pin):newPin();await ref.update({pin:hashPin(pin)});await audit('ตั้งรหัส PDF ใหม่',{teacherKey:key});out={pin};break;",
+              "const pin=b.pin?String(b.pin):newPin();await ref.update({pin:hashPin(pin),pinEnc:encryptPdfPin(pin,key)});await audit('ตั้งรหัส PDF ใหม่',{teacherKey:key});out={pin};break;"
+          )
+
+          # New admin-only operation for revealing an individual PIN.
+          replace_once(
+              admin,
+              "   case 'periodCreate':out=await makePeriod(b);break;",
+              """   case 'pinReveal':{
+                const key=String(b.teacherKey||'');
+                if(!/^[a-f0-9]{64}$/.test(key))
+                  throw error('ข้อมูลครูไม่ถูกต้อง');
+
+                const sn=await db().doc(`teachers/${key}`).get();
+                if(!sn.exists||sn.data()?.status==='trash')
+                  throw error('ไม่พบครูในรายการ',404);
+
+                const pinEnc=sn.data()?.pinEnc;
+                if(!pinEnc){
+                  out={available:false};
+                  break;
+                }
+
+                const pin=decryptPdfPin(pinEnc,key);
+                await audit('เปิดดูรหัส PDF',{teacherKey:key});
+                out={available:true,pin};
+                break;
+             }
+             case 'periodCreate':out=await makePeriod(b);break;"""
+          )
+
+          # Add the view button beside each teacher's existing PIN control.
+          replace_once(
+              main,
+              '<button data-pin="${t.key}" class="button light small">รหัส PDF</button>',
+              '<button data-view-pin="${t.key}" class="button light small">👁 ดูรหัส PDF</button> <button data-pin="${t.key}" class="button light small">ตั้งรหัส PDF</button>'
+          )
+
+          # Show PIN in a private modal only after an explicit admin click.
+          replace_once(
+              main,
+              "function resetPin(t){",
+              """async function revealPin(t){
+           try {
+            const r=await admin('pinReveal',{teacherKey:t.key});
+
+            if(!r.available){
+              return modal(`${modalHead('ดูรหัสผ่าน PDF')}<p>ครู: <b>${esc(t.name)}</b></p><p class="notice">รหัสเดิมถูกเก็บเป็นแฮช จึงไม่สามารถแสดงย้อนหลังได้ กรุณากด "ตั้งรหัส PDF" ในรายการครูเพื่อกำหนดรหัสใหม่หนึ่งครั้ง หลังจากนั้นสามารถกลับมาดูรหัสใหม่ได้</p>`);
+            }
+
+            modal(`${modalHead('ดูรหัสผ่าน PDF')}<p>ครู: <b>${esc(t.name)}</b></p><p class="muted small-text">รหัสนี้เป็นข้อมูลลับสำหรับเปิดเอกสารเงินเดือน กรุณาอย่าเปิดบนอุปกรณ์สาธารณะ</p><label>รหัส PDF<input id="pdfPinValue" class="field" type="password" readonly autocomplete="off" spellcheck="false"></label><div class="row" style="margin-top:12px;flex-wrap:wrap"><button type="button" id="pdfPinToggle" class="button light">แสดงรหัส</button><button type="button" id="pdfPinCopy" class="button primary">คัดลอกรหัส</button></div>`);
+
+            const input=$('pdfPinValue');
+            input.value=r.pin;
+
+            $('pdfPinToggle').onclick=()=>{
+              const show=input.type==='password';
+              input.type=show?'text':'password';
+              $('pdfPinToggle').textContent=show?'ซ่อนรหัส':'แสดงรหัส';
+            };
+
+            $('pdfPinCopy').onclick=async()=>{
+              try {
+                await navigator.clipboard.writeText(input.value);
+                toast('คัดลอกรหัสแล้ว กรุณาส่งให้ครูอย่างปลอดภัย');
+              } catch {
+                toast('เบราว์เซอร์ไม่อนุญาตให้คัดลอก กรุณาแสดงรหัสแล้วคัดลอกด้วยตนเอง');
+              }
+            };
+           } catch(e) {
+            toast(e.message);
+           }
+          }
+
+          function resetPin(t){"""
+          )
+
+          replace_once(
+              main,
+              "เมื่อเปลี่ยนรหัสใหม่ รหัสเดิมจะใช้ไม่ได้อีก ระบบไม่สามารถดูรหัสเดิมย้อนหลังได้",
+              "เมื่อเปลี่ยนรหัสใหม่ รหัสเดิมจะใช้ไม่ได้อีก และแอดมินสามารถกลับมาดูรหัสใหม่ย้อนหลังได้"
+          )
+
+          replace_once(
+              main,
+              "alert(`รหัสใหม่ของ ${t.name} (แสดงครั้งเดียว):\\n${r.pin}`)",
+              "alert(`รหัสใหม่ของ ${t.name}:\\n${r.pin}\\nสามารถกลับมาดูย้อนหลังในหน้าจัดการข้อมูลครูได้`)"
+          )
+
+          replace_once(
+              main,
+              "document.querySelectorAll('[data-pin]').forEach(b=>b.onclick=()=>resetPin(member(b.dataset.pin)));",
+              "document.querySelectorAll('[data-pin]').forEach(b=>b.onclick=()=>resetPin(member(b.dataset.pin)));\n document.querySelectorAll('[data-view-pin]').forEach(b=>b.onclick=()=>revealPin(member(b.dataset.viewPin)));"
+          )
+
+          print('PDF PIN viewer update completed.')
+          PYCODE
+
+      - name: Check JavaScript syntax
+        shell: bash
+        run: |
+          node --check api/_lib.js
+          node --check api/admin.js
+          node --check src/main.js
+
+      - name: Commit updated source files
+        shell: bash
+        run: |
+          git add -- api/_lib.js api/admin.js src/main.js
+
+          if git diff --cached --quiet; then
+            echo "No further change needed."
+            exit 0
+          fi
+
+          git config user.name "$(git log -1 --format=%an)"
+          git config user.email "$(git log -1 --format=%ae)"
+
+          git commit -m "Enable admin PDF PIN viewer"
+          git push origin "HEAD:${{ github.ref_name }}"
