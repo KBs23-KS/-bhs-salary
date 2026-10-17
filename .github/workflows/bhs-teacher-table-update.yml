@@ -1,0 +1,93 @@
+
+name: BHS - Teacher PIN status and group sorting
+
+on:
+  push:
+    paths:
+      - .github/workflows/bhs-teacher-table-update.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Update teacher table only
+        shell: bash
+        run: |
+          python3 - <<'PYCODE'
+          from pathlib import Path
+          p=Path('src/main.js')
+          s=p.read_text(encoding='utf-8')
+          marker="let teacherGroupSortDirection = 'asc';\n"
+          if marker in s:
+              print('Already applied. No changes.')
+              raise SystemExit(0)
+          start=s.index('function renderTeachers(){')
+          end=s.index('function teacherDialog(', start)
+          part=s[start:end]
+          def replace_once(text, old, new, label):
+              if text.count(old)!=1:
+                  raise RuntimeError(f'{label}: expected exactly one anchor, got {text.count(old)}; no files changed')
+              return text.replace(old,new,1)
+          part=replace_once(part,
+              "function renderTeachers(){const arr=state.teachers.filter(t=>t.status!=='trash');return ",
+              """function renderTeachers(){
+           const arr=state.teachers.filter(t=>t.status!=='trash').sort((a,b)=>{
+             const ga=String(a.dept||'').trim(),gb=String(b.dept||'').trim();
+             if(!ga||!gb){if(!ga&&!gb)return String(a.name||'').localeCompare(String(b.name||''),'th');return ga? -1:1;}
+             const cmp=ga.localeCompare(gb,'th',{numeric:true,sensitivity:'base'});
+             return (teacherGroupSortDirection==='asc'?cmp:-cmp)||String(a.name||'').localeCompare(String(b.name||''),'th');
+           });
+           const withPin=arr.filter(t=>t.pinSet).length;
+           return """, 'sort and counts')
+          part=replace_once(part,
+              '</div><div class="table-scroll"><table><thead><tr><th>เลขประชาชน</th>',
+              """</div><p class="muted small-text" style="margin:0 0 12px">สถานะรหัส PDF: ${tag('มีรหัส '+withPin+' คน','green')} ${tag('ยังไม่มีรหัส '+(arr.length-withPin)+' คน','red')} <span style="display:inline-block;margin-top:4px">ป้ายสีเหลืองหมายถึงมีรหัสเดิมแต่ยังดูย้อนหลังไม่ได้</span></p><div class="table-scroll"><table><thead><tr><th>เลขประชาชน</th>""", 'summary')
+          part=replace_once(part,
+              '<th>กลุ่มสาระฯ</th><th>สถานะ</th><th>จัดการ</th>',
+              """<th><button type="button" id="sortTeacherDept" title="กดเพื่อสลับลำดับกลุ่มสาระฯ" aria-label="เรียงกลุ่มสาระฯ สลับจาก ก ถึง ฮ หรือ ฮ ถึง ก" style="font:inherit;font-weight:700;color:inherit;background:none;border:0;padding:0;cursor:pointer">กลุ่มสาระฯ ${teacherGroupSortDirection==='asc'?'↑':'↓'}</button></th><th>สถานะ</th><th>รหัส PDF</th><th>จัดการ</th>""", 'header')
+          part=replace_once(part,
+              "</td><td class=\"nowrap\"><button data-edit=\"${t.key}\"",
+              """</td><td class="nowrap">${!t.pinSet?tag('ยังไม่มีรหัส','red'):t.pinViewable?tag('มีรหัส • ดูได้','green'):tag('มีรหัสเดิม • ดูไม่ได้','amber')}</td><td class="nowrap"><button data-edit="${t.key}""" + '"', 'row')
+          s=s[:start]+marker+part+s[end:]
+          s=replace_once(s,
+              "function bindAdmin(){\n $('addTeacher')",
+              """function bindAdmin(){
+           $('sortTeacherDept')?.addEventListener('click',()=>{teacherGroupSortDirection=teacherGroupSortDirection==='asc'?'desc':'asc';renderAdmin();});
+           $('addTeacher')""",'sort event')
+          # Refresh the table after a new PIN is saved.
+          start=s.index('function resetPin(t)')
+          end=s.index('function csvFields(',start)
+          part=s[start:end]
+          part=replace_once(part,
+              "});closeModal();alert(`รหัสใหม่ของ",
+              "});closeModal();await reload();alert(`รหัสใหม่ของ",
+              'refresh after PIN reset')
+          s=s[:start]+part+s[end:]
+          p.write_text(s,encoding='utf-8')
+          print('Updated only src/main.js')
+          PYCODE
+
+      - name: Check JavaScript syntax
+        run: node --check src/main.js
+
+      - name: Save source to main
+        shell: bash
+        run: |
+          git add -- src/main.js
+          if git diff --cached --quiet; then
+            echo "Already up to date"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Show teacher PDF PIN status and sort by subject group"
+          git push origin "HEAD:${{ github.ref_name }}"
