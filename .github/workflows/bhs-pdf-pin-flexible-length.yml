@@ -1,0 +1,121 @@
+
+name: BHS - Allow short PDF PINs
+
+on:
+  push:
+    paths:
+      - .github/workflows/bhs-pdf-pin-flexible-length.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-pdf-pin-length:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply PDF PIN length change only
+        shell: bash
+        run: |
+          python3 - <<'PYCODE'
+          from pathlib import Path
+
+          ui_path = Path('src/main.js')
+          api_path = Path('api/_lib.js')
+          ui = ui_path.read_text(encoding='utf-8')
+          api = api_path.read_text(encoding='utf-8')
+
+          if ('minlength="8" maxlength="64"' not in ui
+                  and 'pin.length<8||pin.length>64' not in api):
+              if ('maxlength="1024"' in ui
+                      and 'pin.length>1024' in api
+                      and 'ตั้งแต่ 1 ตัวขึ้นไป' in ui):
+                  print('PDF PIN rule is already updated.')
+                  raise SystemExit(0)
+              raise RuntimeError(
+                  'Source version does not match. No files changed.'
+              )
+
+          def replace_exact(text, old, new, count, label):
+              found = text.count(old)
+              if found != count:
+                  raise RuntimeError(
+                      f'{label}: expected {count}, found {found}. '
+                      'No files changed.'
+                  )
+              return text.replace(old, new)
+
+          # Update only the three PDF PIN input fields.
+          ui = replace_exact(
+              ui,
+              'minlength="8" maxlength="64"',
+              'maxlength="1024"',
+              3,
+              'PDF PIN inputs'
+          )
+
+          # Update the admin password-setting message.
+          ui = replace_exact(
+              ui,
+              'รหัสใหม่ (อย่างน้อย 8 ตัว) หรือเว้นว่างให้สุ่ม',
+              'รหัสใหม่ (ตั้งแต่ 1 ตัวขึ้นไป) หรือเว้นว่างให้สุ่ม',
+              1,
+              'PDF PIN description'
+          )
+
+          # Allow 1 to 1024 characters when saving the PDF PIN.
+          api = replace_exact(
+              api,
+              "typeof pin!=='string'||pin.length<8||pin.length>64",
+              "typeof pin!=='string'||!pin.trim()||pin.length>1024",
+              1,
+              'PIN hashing validation'
+          )
+
+          api = replace_exact(
+              api,
+              'รหัส PDF ต้องมี 8–64 ตัวอักษร',
+              'รหัส PDF ต้องมีตั้งแต่ 1 ตัวอักษรขึ้นไป (ไม่เกิน 1,024 ตัวอักษร)',
+              1,
+              'PIN error message'
+          )
+
+          # Allow the same length when a teacher opens a PDF.
+          api = replace_exact(
+              api,
+              '!rec?.salt||!rec?.hash||!pin||pin.length>64',
+              "!rec?.salt||!rec?.hash||typeof pin!=='string'||!pin.trim()||pin.length>1024",
+              1,
+              'PIN verification'
+          )
+
+          ui_path.write_text(ui, encoding='utf-8')
+          api_path.write_text(api, encoding='utf-8')
+          print('PDF PIN length updated successfully.')
+          PYCODE
+
+      - name: Check JavaScript syntax
+        run: |
+          node --check src/main.js
+          node --check api/_lib.js
+
+      - name: Commit updated files
+        shell: bash
+        run: |
+          git add -- src/main.js api/_lib.js
+
+          if git diff --cached --quiet; then
+            echo "No changes needed."
+            exit 0
+          fi
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          git commit -m 'Allow PDF PINs from one character'
+          git push origin "HEAD:${{ github.ref_name }}"
