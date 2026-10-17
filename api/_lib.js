@@ -25,12 +25,12 @@ export function periodKey(year,round) {
 export function documentKey(p,t) { return `${p}_${t}`; }
 export function safeText(v,len=150) { return String(v??'').trim().slice(0,len); }
 export function hashPin(pin) {
-  if(typeof pin!=='string'||pin.length<8||pin.length>64) throw Error('รหัส PDF ต้องมี 8–64 ตัวอักษร');
+  if(typeof pin!=='string'||!pin.trim()||pin.length>1024) throw Error('รหัส PDF ต้องมีตั้งแต่ 1 ตัวอักษรขึ้นไป (ไม่เกิน 1,024 ตัวอักษร)');
   const salt=randomBytes(16).toString('hex');
   return { salt, hash:scryptSync(pin,`${salt}:${required('PIN_PEPPER')}`,64).toString('hex') };
 }
 export function verifyPin(pin, rec) {
-  if (!rec?.salt||!rec?.hash||!pin||pin.length>64) return false;
+  if (!rec?.salt||!rec?.hash||typeof pin!=='string'||!pin.trim()||pin.length>1024) return false;
   const h=scryptSync(pin,`${rec.salt}:${required('PIN_PEPPER')}`,64);
   const stored=Buffer.from(rec.hash,'hex');
   return h.length===stored.length&&timingSafeEqual(h,stored);
