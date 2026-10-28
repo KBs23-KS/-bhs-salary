@@ -1,0 +1,408 @@
+
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="description" content="นโยบายความเป็นส่วนตัว ระบบแจ้งผลพิจารณาเลื่อนเงินเดือน โรงเรียนบ้านแฮดศึกษา">
+  <title>นโยบายความเป็นส่วนตัว | BHS Salary</title>
+  <style>
+    :root {
+      font-family: "Sarabun", "Noto Sans Thai", Tahoma, sans-serif;
+      color: #243049;
+      background: #f5f7fc;
+      line-height: 1.85;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; }
+    a { color: #4338ca; text-underline-offset: 3px; }
+    a:hover { color: #1d4ed8; }
+
+    .top {
+      background: linear-gradient(105deg, #101b36, #26246a 70%, #34318a);
+      color: #fff;
+    }
+    .top-inner {
+      max-width: 980px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 18px 22px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      text-decoration: none;
+      color: #fff;
+      font-weight: 800;
+    }
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: #ffffff19;
+      border: 1px solid #ffffff22;
+    }
+    .brand-icon svg {
+      width: 24px;
+      height: 24px;
+      fill: none;
+      stroke: #e0e7ff;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .brand small {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: #c7d2fe;
+      line-height: 1.4;
+    }
+    .home {
+      color: white;
+      border: 1px solid #ffffff63;
+      padding: 7px 14px;
+      border-radius: 11px;
+      text-decoration: none;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+    .home:hover {
+      color: white;
+      background: #ffffff1a;
+    }
+    .hero {
+      max-width: 980px;
+      margin: auto;
+      padding: 45px 22px 59px;
+      text-align: center;
+    }
+    .eyebrow {
+      color: #c7d2fe;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .04em;
+    }
+    .hero h1 {
+      margin: 5px 0 10px;
+      font-size: clamp(28px, 4vw, 42px);
+      line-height: 1.35;
+    }
+    .hero p {
+      margin: 0;
+      color: #e0e7ff;
+      font-size: 15px;
+    }
+    .content {
+      width: min(940px, calc(100% - 30px));
+      margin: -30px auto 52px;
+      background: white;
+      position: relative;
+      border: 1px solid #e5e9f4;
+      border-radius: 22px;
+      box-shadow: 0 17px 50px #17255412;
+      padding: clamp(22px, 4vw, 47px);
+    }
+    .summary {
+      background: #eef2ff;
+      border: 1px solid #c7d2fe;
+      border-radius: 15px;
+      padding: 16px 20px;
+      margin-bottom: 25px;
+      color: #312e81;
+    }
+    .summary p { margin: 0; }
+    h2 {
+      color: #172554;
+      font-size: 19px;
+      margin: 30px 0 9px;
+      padding-left: 13px;
+      border-left: 4px solid #6366f1;
+      line-height: 1.45;
+    }
+    p { margin: 8px 0 13px; }
+    ul { margin: 6px 0 15px; padding-left: 24px; }
+    li { padding-left: 3px; margin: 5px 0; }
+    .meta {
+      color: #64748b;
+      font-size: 13px;
+      margin: 15px 0 0;
+    }
+    .contact {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 15px;
+      padding: 16px 20px;
+    }
+    .contact strong { color: #172554; }
+    .note { font-size: 13px; color: #64748b; }
+    .bottom {
+      padding: 0 18px 38px;
+      text-align: center;
+      color: #64748b;
+      font-size: 13px;
+    }
+    @media (max-width: 560px) {
+      .top-inner { padding: 14px; }
+      .brand { font-size: 14px; }
+      .brand-icon { width: 39px; height: 39px; }
+      .home { font-size: 12px; padding: 6px 9px; }
+      .hero { padding: 35px 15px 55px; }
+      .hero p { font-size: 13px; }
+      .content {
+        width: calc(100% - 20px);
+        padding: 22px 17px;
+      }
+      h2 { font-size: 17px; }
+    }
+    @media print {
+      .top { background: white; color: #111; }
+      .hero p, .eyebrow { color: #333; }
+      .content { margin: 0 auto; box-shadow: none; border: 0; }
+      .home { display: none; }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="top">
+    <div class="top-inner">
+      <a class="brand" href="/" aria-label="กลับหน้าหลัก">
+        <span class="brand-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M4 21V5l8-3 8 3v16M2 21h20M9 7h.01M15 7h.01M9 11h.01M15 11h.01M9 15h.01M15 15h.01M10 21v-4h4v4"/>
+          </svg>
+        </span>
+        <span>
+          โรงเรียนบ้านแฮดศึกษา
+          <small>ระบบแจ้งผลพิจารณาเลื่อนเงินเดือน (BHS Salary)</small>
+        </span>
+      </a>
+      <a class="home" href="/">กลับหน้าหลัก</a>
+    </div>
+
+    <div class="hero">
+      <div class="eyebrow">PRIVACY POLICY</div>
+      <h1>นโยบายความเป็นส่วนตัว</h1>
+      <p>ระบบแจ้งผลพิจารณาเลื่อนเงินเดือน โรงเรียนบ้านแฮดศึกษา</p>
+    </div>
+  </header>
+
+  <main class="content">
+    <div class="summary">
+      <p>
+        <strong>สรุป:</strong>
+        ระบบ BHS Salary ใช้ข้อมูลบุคลากรเพื่อให้เจ้าของข้อมูล
+        ตรวจสอบเอกสารการเลื่อนเงินเดือนตามปีและรอบที่ได้รับสิทธิ์
+        โดยมีการตรวจสอบรหัสก่อนเปิด PDF และจำกัดสิทธิ์การจัดการข้อมูล
+        ไว้ที่ผู้ดูแลระบบ ข้อมูลไม่ได้มีวัตถุประสงค์เพื่อโฆษณา
+        หรือจำหน่ายให้บุคคลภายนอก
+      </p>
+    </div>
+
+    <h2>1. ผู้ดูแลระบบและขอบเขตการใช้งาน</h2>
+    <p>
+      โรงเรียนบ้านแฮดศึกษาเป็นหน่วยงานที่ใช้ระบบ BHS Salary
+      เพื่อจัดการและให้บริการตรวจสอบเอกสารเกี่ยวกับผลพิจารณาเลื่อนเงินเดือน
+      แก่ครูและบุคลากรทางการศึกษาที่เกี่ยวข้อง
+    </p>
+    <p>
+      นโยบายนี้ครอบคลุมการใช้เว็บไซต์
+      <a href="https://bhs-salary.vercel.app/">
+        bhs-salary.vercel.app
+      </a>
+      และการประมวลผลข้อมูลที่จำเป็นต่อบริการดังกล่าว
+    </p>
+
+    <h2>2. ประเภทข้อมูลที่ระบบใช้</h2>
+    <ul>
+      <li>
+        <strong>ข้อมูลระบุตัวบุคคล:</strong>
+        เลขประจำตัวประชาชน ชื่อ–นามสกุล ตำแหน่ง
+        กลุ่มสาระการเรียนรู้หรือสังกัด และสถานะการปฏิบัติงาน
+      </li>
+      <li>
+        <strong>ข้อมูลเอกสาร:</strong>
+        ปีและรอบการประเมิน สิทธิ์เข้าร่วมรายการ สถานะการเผยแพร่
+        และไฟล์ PDF ซึ่งอาจมีข้อมูลเงินเดือนและข้อมูลส่วนบุคคล
+      </li>
+      <li>
+        <strong>ข้อมูลการรักษาความปลอดภัย:</strong>
+        ข้อมูลสำหรับตรวจสอบรหัสเปิด PDF ข้อมูลการเข้าสู่ระบบของผู้ดูแล
+        ประวัติการจัดการเอกสาร และข้อมูลทางเทคนิคสำหรับจำกัดการร้องขอซ้ำ
+      </li>
+      <li>
+        <strong>ข้อมูลบัญชี Google ที่ผู้ดูแลอนุญาต:</strong>
+        สิทธิ์เข้าถึงไฟล์ Google Drive ที่จำเป็นต่อการจัดเก็บ
+        และเรียกดูเอกสารของระบบ
+      </li>
+    </ul>
+
+    <h2>3. วัตถุประสงค์การประมวลผลข้อมูล</h2>
+    <ul>
+      <li>
+        ตรวจสอบตัวตนสำหรับค้นหารายการเอกสาร
+        ตามเลขประจำตัวประชาชน ปี และรอบการประเมิน
+      </li>
+      <li>
+        แสดงข้อมูลและเอกสารเฉพาะรายการที่ได้รับการเผยแพร่
+        และมีสิทธิ์เข้าถึง
+      </li>
+      <li>
+        ตรวจสอบรหัส PDF ก่อนอนุญาตให้เปิดหรือดาวน์โหลดเอกสาร
+        ตามสิทธิ์ของแต่ละรอบ
+      </li>
+      <li>
+        ให้ผู้ดูแลระบบเพิ่ม แก้ไข นำเข้า จัดเก็บ เผยแพร่
+        ระงับสิทธิ์ และตรวจสอบประวัติการจัดการเอกสาร
+      </li>
+      <li>
+        รักษาความปลอดภัย ตรวจสอบการใช้งานที่ผิดปกติ
+        และสำรองข้อมูลประกอบของระบบ
+      </li>
+    </ul>
+    <p>
+      การใช้ข้อมูลจะจำกัดตามวัตถุประสงค์ในการบริหารงานบุคคล
+      และการให้บริการเอกสาร โดยพิจารณาฐานทางกฎหมาย
+      ที่เกี่ยวข้องกับภารกิจของโรงเรียนและกฎหมายคุ้มครองข้อมูลส่วนบุคคล
+    </p>
+
+    <h2>4. การเชื่อมต่อและใช้ข้อมูลจาก Google Drive</h2>
+    <p>
+      ระบบใช้ Google OAuth เพื่อให้ผู้ดูแลระบบอนุญาตการเข้าถึง
+      Google Drive สำหรับจัดเก็บ จัดการ และอ่านไฟล์เอกสาร
+      ที่ระบบสร้างหรือได้รับอนุญาตให้ใช้
+      โดยขอสิทธิ์
+      <code>https://www.googleapis.com/auth/drive.file</code>
+      เท่าที่จำเป็นต่อการทำงาน
+    </p>
+    <ul>
+      <li>
+        ข้อมูลจาก Google Drive ใช้สำหรับจัดเก็บและแสดงเอกสารเงินเดือน
+        รวมถึงจัดเก็บข้อมูลสำรองประกอบของระบบเท่านั้น
+      </li>
+      <li>
+        ระบบเก็บข้อมูลการอนุญาตที่จำเป็นต่อการเชื่อมต่อ Google Drive
+        ไว้ในระบบหลังบ้านด้วยการเข้ารหัส
+        ไม่แสดงข้อมูลดังกล่าวต่อครูที่ใช้หน้าค้นหา
+      </li>
+      <li>
+        ข้อมูล Google Drive จะไม่ถูกนำไปใช้เพื่อโฆษณา การตลาด
+        หรือขายต่อ และไม่แบ่งปันให้บุคคลภายนอก
+        เพื่อวัตถุประสงค์ที่ไม่เกี่ยวข้องกับบริการนี้
+      </li>
+      <li>
+        ผู้ดูแลบัญชี Google สามารถตรวจสอบหรือยกเลิกสิทธิ์ของแอปได้ที่
+        <a href="https://myaccount.google.com/connections"
+           target="_blank" rel="noopener noreferrer">
+          การเชื่อมต่อกับแอปภายนอกของบัญชี Google
+        </a>
+        การยกเลิกสิทธิ์อาจทำให้ระบบเปิดหรืออัปโหลด PDF
+        ไม่ได้จนกว่าจะเชื่อมต่อใหม่
+      </li>
+    </ul>
+
+    <h2>5. ผู้ให้บริการทางเทคนิคที่เกี่ยวข้อง</h2>
+    <p>
+      ระบบใช้ <strong>Firebase Authentication และ Cloud Firestore</strong>
+      เพื่อยืนยันตัวตนผู้ดูแลและจัดเก็บข้อมูลการทำงาน
+      ใช้ <strong>Google Drive</strong> จัดเก็บไฟล์ PDF
+      และข้อมูลสำรองประกอบ และใช้ <strong>Vercel</strong>
+      สำหรับให้บริการเว็บไซต์และ API
+    </p>
+    <p>
+      การประมวลผลโดยผู้ให้บริการดังกล่าวอยู่ภายใต้ข้อตกลง
+      และนโยบายที่เกี่ยวข้องของแต่ละบริการ
+      โรงเรียนจะไม่เปิดเผยข้อมูลเงินเดือนต่อสาธารณะโดยเจตนา
+      และการเปิดเอกสารผ่านเว็บไซต์ต้องผ่านเงื่อนไขการเผยแพร่
+      และการตรวจสอบสิทธิ์ที่ระบบกำหนด
+    </p>
+
+    <h2>6. มาตรการรักษาความปลอดภัย</h2>
+    <ul>
+      <li>ใช้การเชื่อมต่อเว็บไซต์ผ่าน HTTPS</li>
+      <li>จำกัดการจัดการข้อมูลและเอกสารไว้ที่บัญชีผู้ดูแลที่ได้รับอนุญาต</li>
+      <li>ตรวจสอบรหัส PDF และสร้างลิงก์เข้าถึงเอกสารที่มีเวลาจำกัด</li>
+      <li>
+        บันทึกประวัติการดำเนินงานของผู้ดูแล
+        และมีมาตรการจำกัดคำขอที่ถี่เกินไป
+      </li>
+      <li>จัดเก็บข้อมูลการเชื่อมต่อ Google Drive แบบเข้ารหัสฝั่งเซิร์ฟเวอร์</li>
+    </ul>
+    <p class="note">
+      ไม่มีระบบใดรับประกันความปลอดภัยได้สมบูรณ์
+      ผู้ใช้งานจึงควรเก็บรหัสเปิด PDF เป็นความลับ
+      และไม่เผยแพร่เอกสารเงินเดือนของตนแก่บุคคลที่ไม่เกี่ยวข้อง
+    </p>
+
+    <h2>7. ระยะเวลาการเก็บรักษาและการลบข้อมูล</h2>
+    <p>
+      ข้อมูลบุคลากร รายการเอกสาร และประวัติการจัดการ
+      จะถูกเก็บไว้ตามความจำเป็นในการบริหารงานบุคคล
+      การตรวจสอบย้อนหลัง และระยะเวลาที่กฎหมายหรือระเบียบ
+      ของหน่วยงานกำหนด
+    </p>
+    <p>
+      ผู้ดูแลระบบสามารถจัดการสถานะและนำข้อมูลบางรายการ
+      ออกจากการใช้งานได้ ทั้งนี้ การลบจากหน้าระบบอาจไม่หมายถึง
+      การลบถาวรจากทุกแหล่งจัดเก็บหรือชุดข้อมูลสำรองทันที
+    </p>
+    <p>
+      หากประสงค์ให้ตรวจสอบ แก้ไข หรือลบข้อมูล
+      โปรดติดต่อผู้ดูแลตามช่องทางด้านล่าง
+      เพื่อพิจารณาตามสิทธิและข้อกำหนดที่เกี่ยวข้อง
+    </p>
+
+    <h2>8. สิทธิของเจ้าของข้อมูลส่วนบุคคล</h2>
+    <p>
+      เจ้าของข้อมูลสามารถติดต่อโรงเรียนเพื่อขอเข้าถึง
+      หรือรับทราบข้อมูลของตน ขอแก้ไขข้อมูลที่ไม่ถูกต้อง
+      และขอลบ จำกัดการใช้ หรือคัดค้านการประมวลผล
+      ในกรณีที่กฎหมายให้สิทธิ รวมถึงร้องเรียนต่อหน่วยงานกำกับดูแล
+      ตามกฎหมาย
+    </p>
+    <p>
+      การดำเนินการขึ้นอยู่กับข้อเท็จจริง ฐานทางกฎหมาย
+      และข้อยกเว้นที่ใช้บังคับ
+    </p>
+
+    <h2>9. การติดต่อเกี่ยวกับข้อมูลส่วนบุคคล</h2>
+    <div class="contact">
+      <strong>โรงเรียนบ้านแฮดศึกษา</strong>
+      <div>ผู้ดูแลระบบ BHS Salary</div>
+      <div>
+        อีเมลติดต่อ:
+        <a href="mailto:chayenbb@gmail.com">chayenbb@gmail.com</a>
+      </div>
+      <div class="note">
+        โปรดอย่าส่งเลขประจำตัวประชาชนทั้ง 13 หลัก
+        รหัสเปิด PDF หรือเอกสารเงินเดือนผ่านอีเมลทั่วไป
+        เว้นแต่ได้รับคำแนะนำช่องทางที่ปลอดภัยจากผู้ดูแล
+      </div>
+    </div>
+
+    <h2>10. การเปลี่ยนแปลงนโยบาย</h2>
+    <p>
+      โรงเรียนอาจปรับปรุงนโยบายนี้เมื่อกระบวนการทำงาน
+      ข้อกำหนดด้านกฎหมาย หรือผู้ให้บริการทางเทคนิคเปลี่ยนแปลง
+      โดยจะแสดงฉบับปัจจุบันที่หน้านี้
+    </p>
+    <p class="meta">
+      วันที่จัดทำ/ปรับปรุงล่าสุด: 28 ตุลาคม 2569
+    </p>
+  </main>
+
+  <footer class="bottom">
+    © 2569 โรงเรียนบ้านแฮดศึกษา ·
+    <a href="/">กลับหน้าหลัก</a>
+  </footer>
+</body>
+</html>
